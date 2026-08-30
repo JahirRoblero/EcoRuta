@@ -1,0 +1,32 @@
+.rutas {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: "Montserrat";
+  color: #9d2449;
+  padding: 10px;
+}
+
+.contenedor-rutas {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  align-items: center;
+}
+
+.contenedor-rutas::before,
+.contenedor-rutas::after {
+  content: "";
+  height: 1px;
+  background-color: #d8d8d8;
+  flex: 0.2;
+}
+.contenedor-rutas button {
+  background-color: #9d2449;
+  color: white;
+  font-family: "Montserrat";
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  height: 40px;
+}

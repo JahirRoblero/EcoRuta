@@ -2,6 +2,7 @@ import Barra from "../components/Barra/Barra";
 import ComponenteImagen from "../components/ComponenteImagen/ComponenteImagen";
 import BarraLateral from "../components/BarraLateral/BarraLateral";
 import Mapa from "../components/Mapa/Mapa";
+import InformacionRuta from "../components/InformacionRuta/InformacionRuta";
 import "./Inicio.css";
 import { useEffect, useState } from "react";
 
@@ -48,6 +49,8 @@ function Inicio() {
           onClick={() => setEstaAbierto(false)}
         ></div>
       )}
+
+      <InformacionRuta ruta={"CANDIANI"}></InformacionRuta>
 
       <div className="contenedor-mapa">
         <Mapa

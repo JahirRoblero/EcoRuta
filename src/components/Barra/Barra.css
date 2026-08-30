@@ -1,6 +1,7 @@
 * {
   padding: 0;
   margin: 0;
+  box-sizing: border-box;
 }
 
 @font-face {
@@ -9,6 +10,11 @@
 }
 .barraContenedor {
   background-color: #9d2449;
+  position: fixed;
+  width: 100%;
+  z-index: 90;
+  top: 0;
+  left: 0;
   display: flex;
   gap: 30px;
   padding: 20px;
