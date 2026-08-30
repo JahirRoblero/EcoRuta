@@ -1,5 +1,6 @@
 .contenedor-barralateral {
   position: fixed;
+  z-index: 200;
   background-color: white;
   height: 100vh;
   width: min(390px, 100vw);
@@ -15,6 +16,7 @@
 
 .contenedor-barralateral-cerrado {
   position: fixed;
+  z-index: 200;
   background-color: white;
   height: 100vh;
   width: min(390px, 100vw);

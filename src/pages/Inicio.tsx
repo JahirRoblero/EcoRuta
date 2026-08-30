@@ -11,7 +11,16 @@ function Inicio() {
     <>
       <Barra estaAbierto={estaAbierto} alCerrar={() => setEstaAbierto(true)} />
 
-      <ComponenteImagen />
+      <div className="contenedor-componente-imagen">
+        <ComponenteImagen />
+      </div>
+
+      {estaAbierto && (
+        <div
+          className="fondo-oscuro"
+          onClick={() => setEstaAbierto(false)}
+        ></div>
+      )}
 
       <BarraLateral
         estaAbierto={estaAbierto}
