@@ -3,13 +3,11 @@
 }
 
 .contenedorImagen {
-  width: 80%;
-  max-width: 900px;
+  width: 90%;
+  max-width: 1000px;
   height: 350px;
-
   position: relative;
   overflow: hidden;
-
   margin: 20px auto;
   border-radius: 15px;
 }

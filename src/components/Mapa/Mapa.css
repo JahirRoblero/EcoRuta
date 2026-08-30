@@ -1,0 +1,7 @@
+.mapa {
+  width: 90%;
+  max-width: 1000px;
+  height: 500px;
+  border-radius: 15px;
+  overflow: hidden;
+}
