@@ -1,0 +1,54 @@
+.contenedor-barralateral {
+    position: fixed;
+    background-color: white;
+    height: 100vh;
+    width: 240px;
+    right: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: start;
+}
+.contenedor-barralateral-cerrado {
+    position: fixed;
+    background-color: white;
+    height: 100vh;
+    width: 240px;
+    right: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: start;
+}
+.opciones {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+}
+
+.opciones button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.opciones button:hover {
+    color:  #9D2449;
+}
+
+.cerrar {
+    background-color: transparent;
+    border: none;
+}
+
+.imagenCerrar {
+    width: 20px;
+}
+
+button {
+    padding: 10px;
+    cursor: pointer;
+}
