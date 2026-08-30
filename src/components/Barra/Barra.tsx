@@ -1,7 +1,8 @@
 import "./Barra.css";
 import logoOaxaca from "../../assets/img/logoOaxacaOficial.png";
 import imagenBarra from "../../assets/img/menu.svg";
-function Barra() {
+
+function Barra({ estaAbierto, alCerrar }) {
   return (
     <nav className="barraContenedor">
       <div className="contenedor-izquierdo">
@@ -13,7 +14,7 @@ function Barra() {
         </div>
       </div>
 
-      <button className="boton-imagen">
+      <button onClick={() => alCerrar()} className="boton-imagen">
         <img className="imagenBarra" src={imagenBarra}></img>
       </button>
     </nav>

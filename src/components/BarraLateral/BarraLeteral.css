@@ -1,54 +1,68 @@
 .contenedor-barralateral {
-    position: fixed;
-    background-color: white;
-    height: 100vh;
-    width: 240px;
-    right: 0;
-    top: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: start;
+  position: fixed;
+  background-color: white;
+  height: 100vh;
+  width: min(390px, 100vw);
+  right: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: start;
+  transform: translateX(0);
+  transition: all 0.3s ease;
 }
+
 .contenedor-barralateral-cerrado {
-    position: fixed;
-    background-color: white;
-    height: 100vh;
-    width: 240px;
-    right: 0;
-    top: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: start;
+  position: fixed;
+  background-color: white;
+  height: 100vh;
+  width: min(390px, 100vw);
+  right: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: start;
+  transform: translateX(100%);
+  transition: all 0.3s ease;
 }
+
 .opciones {
-    display: flex;
-    flex-direction: column;
-    align-items: start;
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
 }
 
 .opciones button {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 10px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  text-transform: uppercase;
+  font-family: "Montserrat";
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: #9d2449;
+  width: 100%;
+  display: flex;
+  border-bottom: 1px solid #dfdfdf;
 }
 
 .opciones button:hover {
-    color:  #9D2449;
+  color: #7e1d3a;
 }
 
 .cerrar {
-    background-color: transparent;
-    border: none;
+  background-color: transparent;
+  border: none;
 }
 
 .imagenCerrar {
-    width: 20px;
+  width: 20px;
 }
 
 button {
-    padding: 10px;
-    cursor: pointer;
+  padding: 10px;
+  cursor: pointer;
 }
