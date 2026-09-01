@@ -1,5 +1,5 @@
 import "./BarraLeteral.css";
-import cerrar from "../../assets/img/cerrar.svg";
+import cerrar from "../../../assets/img/cerrar.svg";
 
 function BarraLateral({ estaAbierto, alCerrar }) {
   return (
@@ -17,7 +17,7 @@ function BarraLateral({ estaAbierto, alCerrar }) {
         <button>Inicio</button>
         <button>Rutas</button>
         <button>Puntos de basura</button>
-        <button>Quejas y subjerencias</button>
+        <button>Quejas y sugerencias</button>
         <button>Bandejas</button>
       </div>
     </div>

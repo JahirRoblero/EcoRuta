@@ -1,8 +1,9 @@
-import Barra from "../components/Barra/Barra";
-import ComponenteImagen from "../components/ComponenteImagen/ComponenteImagen";
-import BarraLateral from "../components/BarraLateral/BarraLateral";
-import Mapa from "../components/Mapa/Mapa";
-import InformacionRuta from "../components/InformacionRuta/InformacionRuta";
+import Barra from "../components/Inicio/Barra/Barra";
+import ComponenteImagen from "../components/Inicio/ComponenteImagen/ComponenteImagen";
+import BarraLateral from "../components/Inicio/BarraLateral/BarraLateral";
+import Mapa from "../components/Inicio/Mapa/Mapa";
+import InformacionRuta from "../components/Inicio/InformacionRuta/InformacionRuta";
+import Footer from "../components/Inicio/Footer/Footer";
 import "./Inicio.css";
 import { useEffect, useState } from "react";
 
@@ -59,6 +60,7 @@ function Inicio() {
         />
       </div>
 
+      <Footer></Footer>
       <BarraLateral
         estaAbierto={estaAbierto}
         alCerrar={() => setEstaAbierto(false)}

@@ -1,0 +1,33 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+
+.contenedor-general {
+     background-color: #9d2449;
+     padding: 30px;
+}
+
+.contenedor-informacion {
+    border-top: 8px solid #b38e5d;
+    background-color: white;
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    font-family: 'Montserrat';
+    color: #9d2449;
+    padding: 10px;
+}
+
+.logoOaxaca {
+    width: clamp(60px, 90px, 100px);
+    height: clamp(60px, 90px, 100px);
+}
+
+.contacto, .atencion-ciudadana{
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}

@@ -1,7 +1,7 @@
 import "./ComponenteImagen.css";
-import ParteCamionBasura from "../../assets/img/oaxaca.png";
-import oaxacaLimpia from "../../assets/img/oaxaca limpia.png";
-import oaxacaBarriendo from "../../assets/img/oaxacaBarriendo.jpg";
+import ParteCamionBasura from "../../../assets/img/oaxaca.png";
+import oaxacaLimpia from "../../../assets/img/oaxaca limpia.png";
+import oaxacaBarriendo from "../../../assets/img/oaxacaBarriendo.jpg";
 
 import { useState } from "react";
 
