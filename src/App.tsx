@@ -1,12 +1,13 @@
-import './App.css'
-import Inicio from "../src/pages/Inicio";
-function App() {
+import { Routes, Route } from "react-router";
 
+import Inicio from "./pages/Inicio";
+
+function App() {
   return (
-    <>
-      <Inicio></Inicio>
-    </>
-  )
+    <Routes>
+      <Route path="/" element={<Inicio />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;

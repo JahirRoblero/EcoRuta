@@ -6,7 +6,10 @@ function Footer() {
     <>
       <div className={styles["contenedor-general"]}>
         <div className={styles["contenedor-informacion"]}>
-          <img className={styles.logoOaxaca} src={logoOaxaca}></img>
+          <div>
+            <img className={styles.logoOaxaca} src={logoOaxaca}></img>
+            <h4>OAXACA</h4>
+          </div>
           <div className={styles.contacto}>
             <h4>CONTACTO</h4>
             <p>

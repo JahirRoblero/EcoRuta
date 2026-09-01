@@ -1,7 +1,16 @@
+import { useNavigate } from "react-router";
+
 import "./BarraLeteral.css";
 import cerrar from "../../../assets/img/cerrar.svg";
 
 function BarraLateral({ estaAbierto, alCerrar }) {
+  const navegar = useNavigate();
+
+  const irA = (ruta) => {
+    navegar(ruta);
+    alCerrar();
+  };
+
   return (
     <div
       className={
@@ -13,12 +22,19 @@ function BarraLateral({ estaAbierto, alCerrar }) {
       <button className="cerrar" onClick={() => alCerrar()}>
         <img className="imagenCerrar" src={cerrar}></img>
       </button>
+
       <div className="opciones">
-        <button>Inicio</button>
-        <button>Rutas</button>
-        <button>Puntos de basura</button>
-        <button>Quejas y sugerencias</button>
-        <button>Bandejas</button>
+        <button onClick={() => irA("/")}>Inicio</button>
+
+        <button onClick={() => irA("/rutas")}>Rutas</button>
+
+        <button onClick={() => irA("/puntos-basura")}>Puntos de basura</button>
+
+        <button onClick={() => irA("/quejas-sugerencias")}>
+          Quejas y sugerencias
+        </button>
+
+        <button onClick={() => irA("/bandejas")}>Bandejas</button>
       </div>
     </div>
   );
