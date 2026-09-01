@@ -1,5 +1,6 @@
 import styles from "./Footer.module.css";
 import logoOaxaca from "../../../assets/img/logoOaxacaOficial.png";
+import locationIcon from "../../../assets/img/locationFilled.svg";
 
 function Footer() {
   return (
@@ -12,11 +13,18 @@ function Footer() {
           </div>
           <div className={styles.contacto}>
             <h4>CONTACTO</h4>
-            <p>
-              Av. José María Morelos 108, <br />
-              CALZADA MADERO, Centro, <br />
-              68000 Oaxaca de Juárez, Oax.
-            </p>
+            <div className={styles.datos}>
+              <img
+                src={locationIcon}
+                className={styles["iconos-pequeños"]}
+              ></img>
+              <p>
+                Av. José María Morelos 108, <br />
+                CALZADA MADERO, Centro, <br />
+                68000 Oaxaca de Juárez, Oax.
+              </p>
+            </div>
+
             <p>www.oaxaca.gob.mx</p>
           </div>
 
