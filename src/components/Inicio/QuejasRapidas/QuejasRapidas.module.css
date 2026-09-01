@@ -1,0 +1,8 @@
+.contenedor {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: "Montserrat";
+    color:  #9d2449;
+}

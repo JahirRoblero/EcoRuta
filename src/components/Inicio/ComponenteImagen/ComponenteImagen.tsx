@@ -1,4 +1,4 @@
-import "./ComponenteImagen.css";
+import styles from "./ComponenteImagen.module.css";
 import ParteCamionBasura from "../../../assets/img/oaxaca.png";
 import oaxacaLimpia from "../../../assets/img/oaxaca limpia.png";
 import oaxacaBarriendo from "../../../assets/img/oaxacaBarriendo.jpg";
@@ -11,9 +11,9 @@ function ComponenteImagen() {
   const imagenes = [ParteCamionBasura, oaxacaLimpia, oaxacaBarriendo];
 
   return (
-    <div className="contenedorImagen">
+    <div className={styles.contenedorImagen}>
       <div
-        className="carrusel"
+        className={styles.carrusel}
         style={{
           transform: `translateX(-${imagenActual * 100}%)`,
         }}
@@ -22,18 +22,18 @@ function ComponenteImagen() {
           <img
             key={index}
             src={imagen}
-            className="imagen-camion"
+            className={styles["imagen-camion"]}
             alt={`Imagen ${index + 1}`}
           />
         ))}
       </div>
 
-      <div className="bolitas">
+      <div className={styles.bolitas}>
         {imagenes.map((_, index) => (
           <button
             key={index}
             className={
-              imagenActual === index ? "bolita bolita-activa" : "bolita"
+              imagenActual === index ? styles["bolita"] + " " + styles["bolita-activa"] : styles["bolita"]
             }
             onClick={() => setImagenActual(index)}
           />

@@ -4,7 +4,9 @@ import BarraLateral from "../components/Inicio/BarraLateral/BarraLateral";
 import Mapa from "../components/Inicio/Mapa/Mapa";
 import InformacionRuta from "../components/Inicio/InformacionRuta/InformacionRuta";
 import Footer from "../components/Inicio/Footer/Footer";
-import "./Inicio.css";
+import stylesInicio from "./Inicio.module.css";
+import QuejasRapidas from "../components/Inicio/QuejasRapidas/QuejasRapidas";
+
 import { useEffect, useState } from "react";
 
 function Inicio() {
@@ -40,26 +42,27 @@ function Inicio() {
     <>
       <Barra estaAbierto={estaAbierto} alCerrar={() => setEstaAbierto(true)} />
 
-      <div className="contenedor-componente-imagen">
+      <div className={stylesInicio["contenedor-componente-imagen"]}>
         <ComponenteImagen />
       </div>
 
       {estaAbierto && (
         <div
-          className="fondo-oscuro"
+          className={stylesInicio["fondo-oscuro"]}
           onClick={() => setEstaAbierto(false)}
         ></div>
       )}
 
       <InformacionRuta ruta={"CANDIANI"}></InformacionRuta>
 
-      <div className="contenedor-mapa">
+      <div className={stylesInicio["contenedor-mapa"]}>
         <Mapa
           latitud={posiciones[indice].latitud}
           longitud={posiciones[indice].longitud}
         />
       </div>
 
+      <QuejasRapidas></QuejasRapidas>
       <Footer></Footer>
       <BarraLateral
         estaAbierto={estaAbierto}

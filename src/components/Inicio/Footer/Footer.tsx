@@ -1,18 +1,23 @@
 import styles from "./Footer.module.css";
 import logoOaxaca from "../../../assets/img/logoOaxacaOficial.png";
 import locationIcon from "../../../assets/img/locationFilled.svg";
+import web from "../../../assets/img/www.svg";
+import phone from "../../../assets/img/phone.svg";
+import o89 from "../../../assets/img/089.png";
+import emergencias from "../../../assets/img/911.png";
 
 function Footer() {
   return (
     <>
       <div className={styles["contenedor-general"]}>
         <div className={styles["contenedor-informacion"]}>
-          <div>
+          <div className={styles.logoContenedor}>
             <img className={styles.logoOaxaca} src={logoOaxaca}></img>
             <h4>OAXACA</h4>
           </div>
           <div className={styles.contacto}>
             <h4>CONTACTO</h4>
+
             <div className={styles.datos}>
               <img
                 src={locationIcon}
@@ -25,7 +30,17 @@ function Footer() {
               </p>
             </div>
 
-            <p>www.oaxaca.gob.mx</p>
+            <div className={styles.datos}>
+              <img src={phone} className={styles["iconos-pequeños"]}></img>
+              <p>
+                Tel. <code>(951)</code>5018100 Ext. 40033 y 40124
+              </p>
+            </div>
+
+            <div className={styles.datos}>
+              <img src={web} className={styles["iconos-pequeños"]}></img>
+              <p>www.oaxaca.gob.mx</p>
+            </div>
           </div>
 
           <div className={styles["atencion-ciudadana"]}>
@@ -39,6 +54,11 @@ function Footer() {
             <p>
               Tel. <code>(951)</code>5015000 Ext.13274 y 11259
             </p>
+          </div>
+
+          <div className={styles["atencion-ciudadana"]}>
+            <img src={o89} className={styles["iconos-medianos"]}></img>
+            <img src={emergencias} className={styles["iconos-medianos"]}></img>
           </div>
         </div>
       </div>

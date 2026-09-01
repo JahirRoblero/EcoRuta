@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import "./Mapa.css";
+import styles from "./Mapa.module.css";
 
 function Mapa({ latitud, longitud }) {
   const mapaContenedor = useRef(null);
@@ -91,7 +91,7 @@ function Mapa({ latitud, longitud }) {
     }
   }, [latitud, longitud]);
 
-  return <div ref={mapaContenedor} className="mapa"></div>;
+  return <div ref={mapaContenedor} className={styles.mapa}></div>;
 }
 
 export default Mapa;

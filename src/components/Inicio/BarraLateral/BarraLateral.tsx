@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 
-import "./BarraLeteral.css";
+import styles from "./BarraLeteral.module.css";
 import cerrar from "../../../assets/img/cerrar.svg";
 
 function BarraLateral({ estaAbierto, alCerrar }) {
@@ -15,15 +15,15 @@ function BarraLateral({ estaAbierto, alCerrar }) {
     <div
       className={
         estaAbierto
-          ? "contenedor-barralateral"
-          : "contenedor-barralateral-cerrado"
+          ? styles["contenedor-barralateral"]
+          : styles["contenedor-barralateral-cerrado"]
       }
     >
-      <button className="cerrar" onClick={() => alCerrar()}>
-        <img className="imagenCerrar" src={cerrar}></img>
+      <button className={styles.cerrar} onClick={() => alCerrar()}>
+        <img className={styles.imagenCerrar} src={cerrar}></img>
       </button>
 
-      <div className="opciones">
+      <div className={styles.opciones}>
         <button onClick={() => irA("/")}>Inicio</button>
 
         <button onClick={() => irA("/rutas")}>Rutas</button>

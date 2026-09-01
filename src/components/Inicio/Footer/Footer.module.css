@@ -11,6 +11,7 @@
 
 .contenedor-informacion {
   border-top: 8px solid #b38e5d;
+  border-bottom: 8px solid #b38e5d;
   background-color: white;
   display: flex;
   justify-content: space-evenly;
@@ -37,6 +38,17 @@
   height: clamp(10px, 20px, 40px);
 }
 
+.iconos-medianos {
+  width: clamp(20px, 130px, 180px);
+  height: clamp(20px, 80px, 180px);
+}
+
 .datos {
   display: flex;
+}
+
+.logoContenedor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
