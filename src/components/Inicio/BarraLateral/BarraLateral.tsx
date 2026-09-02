@@ -30,7 +30,7 @@ function BarraLateral({ estaAbierto, alCerrar }) {
 
         <button onClick={() => irA("/puntos-basura")}>Puntos de basura</button>
 
-        <button onClick={() => irA("/quejas-sugerencias")}>
+        <button onClick={() => irA("/quejas")}>
           Quejas y sugerencias
         </button>
 
