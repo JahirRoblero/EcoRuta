@@ -39,12 +39,25 @@ function Inicio() {
   }, []);
 
   return (
-    <>
+    <div className={stylesInicio.pagina}>
       <Barra estaAbierto={estaAbierto} alCerrar={() => setEstaAbierto(true)} />
 
-      <div className={stylesInicio["contenedor-componente-imagen"]}>
-        <ComponenteImagen />
-      </div>
+      <main className={stylesInicio["contenido"]}>
+        <div className={stylesInicio["contenedor-componente-imagen"]}>
+          <ComponenteImagen />
+        </div>
+
+        <InformacionRuta ruta={"CANDIANI"}></InformacionRuta>
+
+        <div className={stylesInicio["contenedor-mapa"]}>
+          <Mapa
+            latitud={posiciones[indice].latitud}
+            longitud={posiciones[indice].longitud}
+          />
+        </div>
+
+        <QuejasRapidas></QuejasRapidas>
+      </main>
 
       {estaAbierto && (
         <div
@@ -53,22 +66,12 @@ function Inicio() {
         ></div>
       )}
 
-      <InformacionRuta ruta={"CANDIANI"}></InformacionRuta>
-
-      <div className={stylesInicio["contenedor-mapa"]}>
-        <Mapa
-          latitud={posiciones[indice].latitud}
-          longitud={posiciones[indice].longitud}
-        />
-      </div>
-
-      <QuejasRapidas></QuejasRapidas>
       <Footer></Footer>
       <BarraLateral
         estaAbierto={estaAbierto}
         alCerrar={() => setEstaAbierto(false)}
       />
-    </>
+    </div>
   );
 }
 
