@@ -2,6 +2,9 @@ import { useState } from "react";
 import Barra from "../../components/Inicio/Barra/Barra";
 import BarraLateral from "../../components/Inicio/BarraLateral/BarraLateral";
 import styles from "./Quejas.module.css";
+import Footer from "../../components/Inicio/Footer/Footer";
+
+
 
 const datosIniciales = {
   tipo: "",
@@ -205,6 +208,8 @@ function Quejas() {
           </div>
         </form>
       </main>
+
+      <Footer/>
 
       <BarraLateral
         estaAbierto={estaAbierto}
