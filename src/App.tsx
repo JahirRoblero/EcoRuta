@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router";
 
 import Inicio from "./pages/Inicio";
 import Rutas from "./pages/Rutas/Rutas";
+import "./App.css";
 import Quejas from "./pages/Quejas/Quejas";
 import "./App.css";
 

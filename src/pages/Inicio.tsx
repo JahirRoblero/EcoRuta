@@ -5,6 +5,7 @@ import Mapa from "../components/Inicio/Mapa/Mapa";
 import InformacionRuta from "../components/Inicio/InformacionRuta/InformacionRuta";
 import Footer from "../components/Inicio/Footer/Footer";
 import stylesInicio from "./Inicio.module.css";
+import camionDescompuesto from "../assets/img/camion de basura descompuesto.jpg";
 import QuejasRapidas from "../components/Inicio/QuejasRapidas/QuejasRapidas";
 
 import { useEffect, useState } from "react";
@@ -56,7 +57,11 @@ function Inicio() {
           />
         </div>
 
-        <QuejasRapidas></QuejasRapidas>
+        <QuejasRapidas
+          tituloQueja="El camión se descompuso"
+          descripcionQueja="Le tiraron 2 balasos al camión"
+          imagenQueja={camionDescompuesto}
+        ></QuejasRapidas>
       </main>
 
       {estaAbierto && (
