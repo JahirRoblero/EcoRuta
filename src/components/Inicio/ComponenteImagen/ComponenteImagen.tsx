@@ -33,7 +33,9 @@ function ComponenteImagen() {
           <button
             key={index}
             className={
-              imagenActual === index ? styles["bolita"] + " " + styles["bolita-activa"] : styles["bolita"]
+              imagenActual === index
+                ? styles["bolita"] + " " + styles["bolita-activa"]
+                : styles["bolita"]
             }
             onClick={() => setImagenActual(index)}
           />

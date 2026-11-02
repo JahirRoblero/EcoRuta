@@ -1,8 +1,16 @@
 .contenedor {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-family: "Montserrat";
-    color:  #9d2449;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: "Montserrat";
+  color: #9d2449;
+  padding: 40px;
+}
+
+.imagen {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  margin-bottom: 20px;
 }
