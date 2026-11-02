@@ -3,11 +3,12 @@ import { Routes, Route } from "react-router";
 import Rutas from "./pages/Rutas/Rutas";
 import Quejas from "./pages/Quejas/Quejas";
 import Login from "./pages/Login/Login";
+import Inicio from "./pages/Inicio";
+import NoEncontrado from "./pages/NoEncontrado";
 
 import RutaProtegida from "./components/RutaProtegida";
 
 import "./App.css";
-import Inicio from "./pages/Inicio";
 
 function App() {
   return (
@@ -19,6 +20,8 @@ function App() {
         <Route path="/rutas" element={<Rutas />} />
         <Route path="/quejas" element={<Quejas />} />
       </Route>
+
+      <Route path="*" element={<NoEncontrado />} />
     </Routes>
   );
 }

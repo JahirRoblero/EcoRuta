@@ -1,0 +1,10 @@
+.pagina-no-encontrada {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-family: "Montserrat";
+  color: #9d2449;
+  padding: 40px;
+}
