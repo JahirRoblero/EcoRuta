@@ -4,8 +4,6 @@ import BarraLateral from "../../components/Inicio/BarraLateral/BarraLateral";
 import styles from "./Quejas.module.css";
 import Footer from "../../components/Inicio/Footer/Footer";
 
-
-
 const datosIniciales = {
   tipo: "",
   categoria: "",
@@ -52,8 +50,8 @@ function Quejas() {
       <main className={styles.contenedor}>
         <h1 className={styles.titulo}>Quejas y Sugerencias</h1>
         <p className={styles.subtitulo}>
-          Ayúdanos a mejorar el servicio de recolección de residuos. Comparte
-          tu queja o sugerencia y con gusto le daremos seguimiento.
+          Ayúdanos a mejorar el servicio de recolección de residuos. Comparte tu
+          queja o sugerencia y con gusto le daremos seguimiento.
         </p>
 
         {enviado && (
@@ -105,7 +103,9 @@ function Quejas() {
               required
             >
               <option value="">Selecciona una opción</option>
-              <option value="recoleccion-no-realizada">Recolección no realizada</option>
+              <option value="recoleccion-no-realizada">
+                Recolección no realizada
+              </option>
               <option value="basura-acumulada">Basura acumulada</option>
               <option value="contenedor-danado">Contenedor dañado</option>
               <option value="sugerencia-ruta">Sugerencia de ruta</option>
@@ -181,7 +181,9 @@ function Quejas() {
           <div className={styles.campo}>
             <label className={styles.etiqueta} htmlFor="contacto">
               Correo o teléfono{" "}
-              <span className={styles.opcional}>(opcional, para seguimiento)</span>
+              <span className={styles.opcional}>
+                (opcional, para seguimiento)
+              </span>
             </label>
             <input
               type="text"
@@ -209,7 +211,7 @@ function Quejas() {
         </form>
       </main>
 
-      <Footer/>
+      <Footer />
 
       <BarraLateral
         estaAbierto={estaAbierto}
