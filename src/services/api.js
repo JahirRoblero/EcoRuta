@@ -1,65 +1,74 @@
 const API_URL = import.meta.env.VITE_API_URL;
 
-export async function iniciarSesion(correo, contrasena) {
-  const respuesta = await fetch(`${API_URL}/api/auth/login`, {
+export async function apiFetch(ruta, opciones = {}) {
+  const { requiereAuth = true, headers = {}, ...configuracion } = opciones;
+
+  const token = localStorage.getItem("token");
+
+  const encabezados = new Headers(headers);
+
+  if (
+    configuracion.body &&
+    !(configuracion.body instanceof FormData) &&
+    !encabezados.has("Content-Type")
+  ) {
+    encabezados.set("Content-Type", "application/json");
+  }
+
+  if (requiereAuth && token) {
+    encabezados.set("Authorization", `Bearer ${token}`);
+  }
+
+  const respuesta = await fetch(`${API_URL}${ruta}`, {
+    ...configuracion,
+    headers: encabezados,
+  });
+
+  if (respuesta.status === 401 && requiereAuth) {
+    if (localStorage.getItem("token") === token) {
+      window.dispatchEvent(new Event("ecorruta:sesion-expirada"));
+    }
+
+    const error = new Error("Sesión expirada o no válida");
+    error.status = 401;
+
+    throw error;
+  }
+
+  if (!respuesta.ok) {
+    const mensaje =
+      respuesta.status === 401
+        ? "Correo o contraseña incorrectos"
+        : `Error HTTP: ${respuesta.status}`;
+
+    const error = new Error(mensaje);
+    error.status = respuesta.status;
+
+    throw error;
+  }
+
+  if (respuesta.status === 204) {
+    return null;
+  }
+
+  return respuesta.json();
+}
+
+export function iniciarSesion(correo, contrasena) {
+  return apiFetch("/api/auth/login", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    requiereAuth: false,
     body: JSON.stringify({
       correo,
       contrasena,
     }),
   });
-
-  if (respuesta.status === 401) {
-    throw new Error("Correo o contraseña incorrectos");
-  }
-
-  if (!respuesta.ok) {
-    throw new Error("No se pudo iniciar sesión");
-  }
-
-  return await respuesta.json();
 }
 
-export async function obtenerDatosPrivados() {
-  const token = localStorage.getItem("token");
-
-  const respuesta = await fetch(`${API_URL}/api/auth/privado`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (respuesta.status === 401) {
-    localStorage.removeItem("token");
-    throw new Error("Sesión expirada o no válida");
-  }
-
-  if (!respuesta.ok) {
-    throw new Error("No se pudo consultar el backend");
-  }
-
-  return await respuesta.json();
+export function obtenerDatosPrivados() {
+  return apiFetch("/api/auth/privado");
 }
 
-export async function obtenerReportesAleatorios() {
-  const token = localStorage.getItem("token");
-
-  const respuesta = await fetch(
-    `${import.meta.env.VITE_API_URL}/api/reportes/aleatorios`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  );
-
-  if (!respuesta.ok) {
-    throw new Error("Error al obtener reportes");
-  }
-
-  return respuesta.json();
+export function obtenerReportesRecientes() {
+  return apiFetch("/api/reportes/recientes");
 }

@@ -4,13 +4,14 @@ import styles from "./Login.module.css";
 import { iniciarSesion } from "../../services/api";
 import logoOaxaca from "../../assets/img/logoOaxacaOficial.png";
 import oaxacaLimpia from "../../assets/img/Oaxaca LimpiaVerde.png";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(false);
-
+  const { guardarSesion } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -22,7 +23,7 @@ export default function Login() {
     try {
       const datos = await iniciarSesion(correo, contrasena);
 
-      localStorage.setItem("token", datos.token);
+      guardarSesion(datos.token);
 
       const destino = location.state?.from?.pathname || "/rutas";
 

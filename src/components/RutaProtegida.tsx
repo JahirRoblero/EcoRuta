@@ -1,10 +1,11 @@
 import { Navigate, Outlet, useLocation } from "react-router";
+import { useAuth } from "../context/AuthContext";
 
 export default function RutaProtegida() {
-  const token = localStorage.getItem("token");
+  const { estaAutenticado } = useAuth();
   const location = useLocation();
 
-  if (!token) {
+  if (!estaAutenticado) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

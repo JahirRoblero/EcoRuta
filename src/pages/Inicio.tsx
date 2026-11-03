@@ -6,7 +6,7 @@ import InformacionRuta from "../components/Inicio/InformacionRuta/InformacionRut
 import Footer from "../components/Inicio/Footer/Footer";
 import QuejasRapidas from "../components/Inicio/QuejasRapidas/QuejasRapidas";
 
-import { obtenerReportesAleatorios } from "../services/api";
+import { obtenerReportesRecientes } from "../services/api";
 import stylesInicio from "./Inicio.module.css";
 
 import { useEffect, useState, useRef } from "react";
@@ -70,7 +70,7 @@ function Inicio() {
   useEffect(() => {
     let activo = true;
 
-    obtenerReportesAleatorios()
+    obtenerReportesRecientes()
       .then((datos) => {
         if (activo) setReportes(datos);
       })
