@@ -32,3 +32,88 @@
 .contenido {
   flex: 1;
 }
+
+.seccionReportes {
+  width: 100%;
+  min-width: 0;
+  padding: 30px 20px;
+  box-sizing: border-box;
+  color: #c62828;
+  font-family: "Montserrat", sans-serif;
+}
+
+/* Título y botones */
+.encabezadoReportes {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.controlesReportes {
+  display: flex;
+  gap: 10px;
+}
+
+.controlesReportes button {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: #c62828;
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.controlesReportes button:hover {
+  background: #8e1b1b;
+}
+
+.controlesReportes button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.listaReportes {
+  display: flex;
+  gap: 20px;
+
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+
+  padding: 10px 0 20px;
+  scrollbar-width: thin;
+  scrollbar-color: #c62828 transparent;
+}
+
+.tarjetaReporte {
+  flex: 0 0 clamp(260px, 32vw, 360px);
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.tarjetaReporte > * {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+  .seccionReportes {
+    padding: 20px 15px;
+  }
+
+  .tarjetaReporte {
+    flex-basis: 84%;
+  }
+
+  .encabezadoReportes h2 {
+    font-size: 20px;
+  }
+}

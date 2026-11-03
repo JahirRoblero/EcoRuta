@@ -9,7 +9,7 @@ import QuejasRapidas from "../components/Inicio/QuejasRapidas/QuejasRapidas";
 import { obtenerReportesAleatorios } from "../services/api";
 import stylesInicio from "./Inicio.module.css";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 const posiciones = [
   { latitud: 17.0732, longitud: -96.7266 },
@@ -41,6 +41,17 @@ function Inicio() {
   const [reportes, setReportes] = useState([]);
   const [cargandoReportes, setCargandoReportes] = useState(true);
   const [errorReportes, setErrorReportes] = useState("");
+
+  const carruselRef = useRef(null);
+
+  const desplazarReportes = (direccion) => {
+    if (!carruselRef.current) return;
+
+    carruselRef.current.scrollBy({
+      left: direccion * carruselRef.current.clientWidth * 0.8,
+      behavior: "smooth",
+    });
+  };
 
   useEffect(() => {
     const intervalo = setInterval(() => {
@@ -93,8 +104,30 @@ function Inicio() {
           />
         </div>
 
-        <section>
-          <h2>Reportes recientes</h2>
+        <section className={stylesInicio.seccionReportes}>
+          <div className={stylesInicio.encabezadoReportes}>
+            <h2>Reportes de la comunidad</h2>
+
+            <div className={stylesInicio.controlesReportes}>
+              <button
+                type="button"
+                onClick={() => desplazarReportes(-1)}
+                aria-label="Ver reportes anteriores"
+                disabled={reportes.length === 0}
+              >
+                ‹
+              </button>
+
+              <button
+                type="button"
+                onClick={() => desplazarReportes(1)}
+                aria-label="Ver reportes siguientes"
+                disabled={reportes.length === 0}
+              >
+                ›
+              </button>
+            </div>
+          </div>
 
           {cargandoReportes && <p>Cargando reportes...</p>}
 
@@ -104,14 +137,24 @@ function Inicio() {
             <p>No hay reportes disponibles.</p>
           )}
 
-          {reportes.map((reporte) => (
-            <QuejasRapidas
-              key={reporte.idReporte}
-              tituloQueja={reporte.titulo}
-              descripcionQueja={reporte.descripcion}
-              imagenQueja={obtenerUrlImagen(reporte.imagenUrl)}
-            />
-          ))}
+          <div
+            ref={carruselRef}
+            className={stylesInicio.listaReportes}
+            aria-label="Reportes de la comunidad"
+          >
+            {reportes.map((reporte) => (
+              <div
+                key={reporte.idReporte}
+                className={stylesInicio.tarjetaReporte}
+              >
+                <QuejasRapidas
+                  tituloQueja={reporte.titulo}
+                  descripcionQueja={reporte.descripcion}
+                  imagenQueja={obtenerUrlImagen(reporte.imagenUrl)}
+                />
+              </div>
+            ))}
+          </div>
         </section>
       </main>
 
