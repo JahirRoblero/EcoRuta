@@ -5,8 +5,17 @@ function QuejasRapidas({ tituloQueja, descripcionQueja, imagenQueja }) {
     <div className={stylesQuejas["contenedor"]}>
       <div className={stylesQuejas["contenedor-reportes"]}>
         <h3>{tituloQueja}</h3>
+
         <p>{descripcionQueja}</p>
-        <img className={stylesQuejas.imagen} src={imagenQueja}></img>
+
+        {imagenQueja && (
+          <img
+            className={stylesQuejas.imagen}
+            src={imagenQueja}
+            alt={`Imagen del reporte: ${tituloQueja}`}
+            loading="lazy"
+          />
+        )}
       </div>
     </div>
   );

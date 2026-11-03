@@ -44,3 +44,22 @@ export async function obtenerDatosPrivados() {
 
   return await respuesta.json();
 }
+
+export async function obtenerReportesAleatorios() {
+  const token = localStorage.getItem("token");
+
+  const respuesta = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/reportes/aleatorios`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!respuesta.ok) {
+    throw new Error("Error al obtener reportes");
+  }
+
+  return respuesta.json();
+}
