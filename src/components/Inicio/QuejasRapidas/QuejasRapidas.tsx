@@ -6,7 +6,7 @@ function QuejasRapidas({ tituloQueja, descripcionQueja, imagenQueja }) {
       <div className={stylesQuejas["contenedor-reportes"]}>
         <h3>{tituloQueja}</h3>
 
-        <p>{descripcionQueja}</p>
+        <p className={stylesQuejas.descripcion}>{descripcionQueja}</p>
 
         {imagenQueja && (
           <img
