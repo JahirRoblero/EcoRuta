@@ -9,18 +9,9 @@ import menorque from "../assets/img/menorque.svg";
 import mayorque from "../assets/img/mayorque.svg";
 import { obtenerReportesRecientes } from "../services/api";
 import stylesInicio from "./Inicio.module.css";
+import { obtenerMiRuta } from "../services/api";
 
 import { useEffect, useState, useRef } from "react";
-
-const posiciones = [
-  { latitud: 17.0732, longitud: -96.7266 },
-  { latitud: 17.0735, longitud: -96.7269 },
-  { latitud: 17.0738, longitud: -96.7272 },
-  { latitud: 17.0741, longitud: -96.7276 },
-  { latitud: 17.0745, longitud: -96.728 },
-  { latitud: 17.0749, longitud: -96.7285 },
-  { latitud: 17.0753, longitud: -96.729 },
-];
 
 function obtenerUrlImagen(imagenUrl) {
   if (!imagenUrl) return null;
@@ -37,11 +28,21 @@ function obtenerUrlImagen(imagenUrl) {
 
 function Inicio() {
   const [estaAbierto, setEstaAbierto] = useState(false);
-  const [indice, setIndice] = useState(0);
 
   const [reportes, setReportes] = useState([]);
   const [cargandoReportes, setCargandoReportes] = useState(true);
   const [errorReportes, setErrorReportes] = useState("");
+
+  interface RutaInicio {
+    nombre: string;
+    descripcion: string | null;
+    geometria: string;
+    deMiColonia: boolean;
+  }
+
+  const [rutaActual, setRutaActual] = useState<RutaInicio | null>(null);
+  const [cargandoRuta, setCargandoRuta] = useState(true);
+  const [errorRuta, setErrorRuta] = useState("");
 
   const carruselRef = useRef(null);
 
@@ -53,20 +54,6 @@ function Inicio() {
       behavior: "smooth",
     });
   };
-
-  useEffect(() => {
-    const intervalo = setInterval(() => {
-      setIndice((indiceAnterior) => {
-        if (indiceAnterior >= posiciones.length - 1) {
-          return indiceAnterior;
-        }
-
-        return indiceAnterior + 1;
-      });
-    }, 2000);
-
-    return () => clearInterval(intervalo);
-  }, []);
 
   useEffect(() => {
     let activo = true;
@@ -87,6 +74,31 @@ function Inicio() {
     };
   }, []);
 
+  useEffect(() => {
+    let activo = true;
+
+    obtenerMiRuta()
+      .then((datos: RutaInicio) => {
+        if (activo) {
+          setRutaActual(datos);
+        }
+      })
+      .catch((error: Error) => {
+        if (activo) {
+          setErrorRuta(error.message);
+        }
+      })
+      .finally(() => {
+        if (activo) {
+          setCargandoRuta(false);
+        }
+      });
+
+    return () => {
+      activo = false;
+    };
+  }, []);
+
   return (
     <div className={stylesInicio.pagina}>
       <Barra estaAbierto={estaAbierto} alCerrar={() => setEstaAbierto(true)} />
@@ -96,13 +108,24 @@ function Inicio() {
           <ComponenteImagen />
         </div>
 
-        <InformacionRuta ruta={"CANDIANI"} />
+        <InformacionRuta ruta={rutaActual?.nombre ?? "SIN RUTA"} />
+
+        {rutaActual && (
+          <p>
+            {rutaActual.deMiColonia
+              ? "Ruta asignada a tu colonia"
+              : "Mostrando una ruta alternativa disponible"}
+          </p>
+        )}
 
         <div className={stylesInicio["contenedor-mapa"]}>
-          <Mapa
-            latitud={posiciones[indice].latitud}
-            longitud={posiciones[indice].longitud}
-          />
+          {cargandoRuta && <p>Cargando ruta...</p>}
+
+          {errorRuta && <p role="alert">{errorRuta}</p>}
+
+          {!cargandoRuta && !errorRuta && rutaActual && (
+            <Mapa geometria={rutaActual.geometria} />
+          )}
         </div>
 
         <section className={stylesInicio.seccionReportes}>

@@ -72,3 +72,7 @@ export function obtenerDatosPrivados() {
 export function obtenerReportesRecientes() {
   return apiFetch("/api/reportes/recientes");
 }
+
+export function obtenerMiRuta() {
+  return apiFetch("/api/rutas/mi-ruta");
+}
