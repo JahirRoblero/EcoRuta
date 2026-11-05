@@ -69,6 +69,15 @@
   font-size: 28px;
   cursor: pointer;
   transition: background 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.controlesReportes button img {
+  width: 50%;
+  height: 50%;
+  object-fit: contain;
 }
 
 .controlesReportes button:hover {
@@ -118,4 +127,22 @@
   .encabezadoReportes h2 {
     font-size: 20px;
   }
+
+  .controlesReportes button {
+    display: none;
+  }
+}
+
+.realizarReporte {
+  background-color: #9d2449;
+  border: 1px solid #9d2449;
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }

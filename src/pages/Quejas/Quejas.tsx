@@ -48,7 +48,7 @@ function Quejas() {
       )}
 
       <main className={styles.contenedor}>
-        <h1 className={styles.titulo}>Quejas y Sugerencias</h1>
+        <h1 className={styles.titulo}>Reportes y Sugerencias</h1>
         <p className={styles.subtitulo}>
           Ayúdanos a mejorar el servicio de recolección de residuos. Comparte tu
           queja o sugerencia y con gusto le daremos seguimiento.
@@ -75,7 +75,7 @@ function Quejas() {
                   onChange={alCambiar}
                   required
                 />
-                Queja
+                Reporte
               </label>
               <label className={styles["opcion-radio"]}>
                 <input

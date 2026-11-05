@@ -5,7 +5,8 @@ import Mapa from "../components/Inicio/Mapa/Mapa";
 import InformacionRuta from "../components/Inicio/InformacionRuta/InformacionRuta";
 import Footer from "../components/Inicio/Footer/Footer";
 import QuejasRapidas from "../components/Inicio/QuejasRapidas/QuejasRapidas";
-
+import menorque from "../assets/img/menorque.svg";
+import mayorque from "../assets/img/mayorque.svg";
 import { obtenerReportesRecientes } from "../services/api";
 import stylesInicio from "./Inicio.module.css";
 
@@ -108,25 +109,34 @@ function Inicio() {
           <div className={stylesInicio.encabezadoReportes}>
             <h2>Reportes de la comunidad</h2>
 
-            <div className={stylesInicio.controlesReportes}>
-              <button
-                type="button"
-                onClick={() => desplazarReportes(-1)}
-                aria-label="Ver reportes anteriores"
-                disabled={reportes.length === 0}
-              >
-                ‹
-              </button>
+            {reportes.length > 0 && (
+              <div className={stylesInicio.controlesReportes}>
+                <button
+                  type="button"
+                  onClick={() => desplazarReportes(-1)}
+                  aria-label="Ver reportes anteriores"
+                  disabled={reportes.length === 0}
+                >
+                  <img src={menorque} alt="Anterior" />
+                </button>
 
-              <button
-                type="button"
-                onClick={() => desplazarReportes(1)}
-                aria-label="Ver reportes siguientes"
-                disabled={reportes.length === 0}
-              >
-                ›
-              </button>
-            </div>
+                <button
+                  type="button"
+                  onClick={() => desplazarReportes(1)}
+                  aria-label="Ver reportes siguientes"
+                  disabled={reportes.length === 0}
+                >
+                  <img src={mayorque} alt="Siguiente" />
+                </button>
+              </div>
+            )}
+            <button
+              type="button"
+              className={stylesInicio.realizarReporte}
+              onClick={() => (window.location.href = "/reportes")}
+            >
+              Realizar un reporte
+            </button>
           </div>
 
           {cargandoReportes && <p>Cargando reportes...</p>}

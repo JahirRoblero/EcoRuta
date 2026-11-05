@@ -18,7 +18,7 @@ function App() {
       <Route element={<RutaProtegida />}>
         <Route path="/" element={<Inicio />} />
         <Route path="/rutas" element={<Rutas />} />
-        <Route path="/quejas" element={<Quejas />} />
+        <Route path="/reportes" element={<Quejas />} />
       </Route>
 
       <Route path="*" element={<NoEncontrado />} />
