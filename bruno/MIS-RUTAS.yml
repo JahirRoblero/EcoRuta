@@ -1,0 +1,18 @@
+info:
+  name: MIS-RUTAS
+  type: http
+  seq: 5
+
+http:
+  method: GET
+  url: http://localhost:8080/api/rutas/mi-ruta
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwcnVlYmFAZWNvcnJ1dGEuY29tIiwicm9sIjoiQ0lVREFEQU5PIiwiaWF0IjoxNzkzODU0MDkzLCJleHAiOjE3OTM4NTQ2OTN9.3g7h6eT6L1GWOeDNtjCXYQIq6Jw-cM0xeJ2dVKUSytxvzhIvbISZHMuJpjj9dTfz
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
