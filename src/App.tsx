@@ -7,7 +7,7 @@ import Inicio from "./pages/Inicio";
 import NoEncontrado from "./pages/NoEncontrado";
 
 import RutaProtegida from "./components/RutaProtegida";
-
+import Reportes from "./pages/Reportes/Reportes";
 import "./App.css";
 
 function App() {
@@ -18,7 +18,8 @@ function App() {
       <Route element={<RutaProtegida />}>
         <Route path="/" element={<Inicio />} />
         <Route path="/rutas" element={<Rutas />} />
-        <Route path="/reportes" element={<Quejas />} />
+        <Route path="/crear-reportes" element={<Quejas />} />
+        <Route path="/reportes" element={<Reportes />} />
       </Route>
 
       <Route path="*" element={<NoEncontrado />} />

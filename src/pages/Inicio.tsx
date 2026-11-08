@@ -143,7 +143,7 @@ function Inicio() {
             <button
               type="button"
               className={stylesInicio.realizarReporte}
-              onClick={() => (window.location.href = "/reportes")}
+              onClick={() => (window.location.href = "/crear-reportes")}
             >
               Realizar un reporte
             </button>
@@ -175,6 +175,13 @@ function Inicio() {
               </div>
             ))}
           </div>
+          <button
+            type="button"
+            className={stylesInicio.realizarReporte}
+            onClick={() => (window.location.href = "/reportes")}
+          >
+            Ver todos los reportes
+          </button>
         </section>
       </main>
 
