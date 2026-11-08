@@ -76,3 +76,21 @@ export function obtenerReportesRecientes() {
 export function obtenerMiRuta() {
   return apiFetch("/api/rutas/mi-ruta");
 }
+
+export function crearReporte(datos, imagen) {
+  const formulario = new FormData();
+
+  formulario.append(
+    "datos",
+    new Blob([JSON.stringify(datos)], { type: "application/json" }),
+  );
+
+  if (imagen) {
+    formulario.append("imagen", imagen, imagen.name);
+  }
+
+  return apiFetch("/api/reportes", {
+    method: "POST",
+    body: formulario,
+  });
+}
