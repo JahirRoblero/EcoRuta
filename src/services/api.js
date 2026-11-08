@@ -94,3 +94,17 @@ export function crearReporte(datos, imagen) {
     body: formulario,
   });
 }
+
+export function obtenerUrlImagen(imagenUrl) {
+  if (!imagenUrl) return null;
+
+  if (imagenUrl.startsWith("https://") || imagenUrl.startsWith("http://")) {
+    return imagenUrl;
+  }
+
+  const base = import.meta.env.VITE_API_URL.replace(/\/$/, "");
+
+  const ruta = imagenUrl.startsWith("/") ? imagenUrl : `/${imagenUrl}`;
+
+  return `${base}${ruta}`;
+}

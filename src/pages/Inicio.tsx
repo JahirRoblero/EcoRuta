@@ -10,21 +10,8 @@ import mayorque from "../assets/img/mayorque.svg";
 import { obtenerReportesRecientes } from "../services/api";
 import stylesInicio from "./Inicio.module.css";
 import { obtenerMiRuta } from "../services/api";
-
+import { obtenerUrlImagen } from "../services/api";
 import { useEffect, useState, useRef } from "react";
-
-function obtenerUrlImagen(imagenUrl) {
-  if (!imagenUrl) return null;
-
-  if (/^https?:\/\//i.test(imagenUrl)) {
-    return imagenUrl;
-  }
-
-  const base = import.meta.env.VITE_API_URL;
-  const ruta = imagenUrl.startsWith("/") ? imagenUrl : `/${imagenUrl}`;
-
-  return `${base}${ruta}`;
-}
 
 function Inicio() {
   const [estaAbierto, setEstaAbierto] = useState(false);
