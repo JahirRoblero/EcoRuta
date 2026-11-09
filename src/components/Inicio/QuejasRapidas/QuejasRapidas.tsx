@@ -1,6 +1,13 @@
 import stylesQuejas from "./QuejasRapidas.module.css";
 
-function QuejasRapidas({ tituloQueja, descripcionQueja, imagenQueja }) {
+function QuejasRapidas({
+  tituloQueja,
+  descripcionQueja,
+  imagenQueja,
+  nombre,
+  colonia,
+  codigoPostal,
+}) {
   return (
     <div className={stylesQuejas["contenedor"]}>
       <div className={stylesQuejas["contenedor-reportes"]}>
@@ -8,6 +15,9 @@ function QuejasRapidas({ tituloQueja, descripcionQueja, imagenQueja }) {
 
         <p className={stylesQuejas.descripcion}>{descripcionQueja}</p>
 
+        <p>Vecino: {nombre}</p>
+        <p>Colonia: {colonia}</p>
+        <p>Codigo Postal: {codigoPostal}</p>
         {imagenQueja && (
           <img
             className={stylesQuejas.imagen}

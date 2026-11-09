@@ -49,6 +49,9 @@ function Reportes() {
                 tituloQueja={reporte.titulo}
                 descripcionQueja={reporte.descripcion}
                 imagenQueja={obtenerUrlImagen(reporte.imagenUrl)}
+                nombre={reporte.nombre}
+                colonia={reporte.coloniaNombre}
+                codigoPostal={reporte.coloniaCodigoPostals}
               ></QuejasRapidas>
             </div>
           ))}

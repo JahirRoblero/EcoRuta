@@ -96,15 +96,15 @@ function Inicio() {
         </div>
 
         <InformacionRuta ruta={rutaActual?.nombre ?? "SIN RUTA"} />
-
         {rutaActual && (
-          <p>
-            {rutaActual.deMiColonia
-              ? "Ruta asignada a tu colonia"
-              : "Mostrando una ruta alternativa disponible"}
-          </p>
+          <div className={stylesInicio.rutaAsignada}>
+            <p>
+              {rutaActual.deMiColonia
+                ? "Ruta asignada a tu colonia"
+                : "Mostrando una ruta alternativa disponible"}
+            </p>
+          </div>
         )}
-
         <div className={stylesInicio["contenedor-mapa"]}>
           {cargandoRuta && <p>Cargando ruta...</p>}
 
@@ -171,6 +171,9 @@ function Inicio() {
                   tituloQueja={reporte.titulo}
                   descripcionQueja={reporte.descripcion}
                   imagenQueja={obtenerUrlImagen(reporte.imagenUrl)}
+                  nombre={reporte.nombre}
+                  colonia={reporte.coloniaNombre}
+                  codigoPostal={reporte.coloniaCodigoPostals}
                 />
               </div>
             ))}

@@ -12,3 +12,15 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
 }
+
+@media (max-width: 1150px) {
+  .contenedorReportes {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@media (max-width: 500px) {
+  .contenedorReportes {
+    display: block;
+  }
+}

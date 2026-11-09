@@ -146,3 +146,11 @@
     background 0.2s,
     color 0.2s;
 }
+
+.rutaAsignada {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Montserrat";
+  font-size: 20px;
+}
