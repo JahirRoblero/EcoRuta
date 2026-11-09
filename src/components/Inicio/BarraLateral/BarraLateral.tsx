@@ -30,7 +30,7 @@ function BarraLateral({ estaAbierto, alCerrar }) {
 
         <button onClick={() => irA("/puntos-basura")}>Puntos de basura</button>
 
-        <button onClick={() => irA("/quejas")}>Reportes</button>
+        <button onClick={() => irA("/reportes")}>Reportes</button>
 
         <button onClick={() => irA("/bandejas")}>Bandejas</button>
       </div>
