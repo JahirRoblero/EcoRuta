@@ -4,6 +4,7 @@ import styles from "./Login.module.css";
 import { iniciarSesion } from "../../services/api";
 import logoOaxaca from "../../assets/img/logoOaxacaOficial.png";
 import oaxacaLimpia from "../../assets/img/Oaxaca LimpiaVerde.png";
+import logoEcorrutaBlanco from "../../assets/img/LogoEcorrutaCirculo.png";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
@@ -85,7 +86,7 @@ export default function Login() {
         <div className={styles.divisionDerecha}>
           <img
             className={styles.oaxacaLimpia}
-            src={oaxacaLimpia}
+            src={logoEcorrutaBlanco}
             alt="Oaxaca Limpia"
           ></img>
         </div>

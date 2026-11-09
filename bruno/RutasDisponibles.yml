@@ -6,7 +6,9 @@ info:
 http:
   method: GET
   url: http://localhost:8080/api/rutas/disponibles
-  auth: inherit
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhbmdlbEBlY29ycnV0YS5jb20iLCJyb2wiOiJDSVVEQURBTk8iLCJpYXQiOjE3OTQxOTI5OTQsImV4cCI6MTc5NDE5MzU5NH0.oXMO8XABUGCa63jEc6IvM2Y2y93vzSBfFKV_iW4lviXhP2Nx7-OQfF4zNfQjpDcp
 
 settings:
   encodeUrl: true

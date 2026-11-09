@@ -8,7 +8,7 @@ http:
   url: http://localhost:8080/api/reportes/todos-reportes
   auth:
     type: bearer
-    token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhbmdlbEBlY29ycnV0YS5jb20iLCJyb2wiOiJDSVVEQURBTk8iLCJpYXQiOjE3OTQxODM3NzEsImV4cCI6MTc5NDE4NDM3MX0.yOX72i4SdD2NZaEQ-lSAjnR3kwqHEafimoIGaHI0dKNEltAKKqD8Tor_USmr1Qml
+    token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwcnVlYmFAZWNvcnJ1dGEuY29tIiwicm9sIjoiQ0lVREFEQU5PIiwiaWF0IjoxNzk0MTg3OTUzLCJleHAiOjE3OTQxODg1NTN9.K0Xiz640CMpzJgXSVD4YCcax6YZX8oluNhTiuq9BjNddkRr1OThoSvVgMZt_k5OF
 
 settings:
   encodeUrl: true

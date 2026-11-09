@@ -1,12 +1,13 @@
 import styles from "./Barra.module.css";
 import logoOaxaca from "../../../assets/img/logoOaxacaOficial.png";
 import imagenBarra from "../../../assets/img/menu.svg";
+import logoEcorruta from "../../../assets/img/LogoEcorrutaBlanco.png";
 
 function Barra({ estaAbierto, alCerrar }) {
   return (
     <nav className={styles.barraContenedor}>
       <div className={styles["contenedor-izquierdo"]}>
-        <img className={styles.logoOaxaca} src={logoOaxaca}></img>
+        <img className={styles.logoOaxaca} src={logoEcorruta}></img>
 
         <div className="titulo">
           <h1>Ecorruta</h1>
