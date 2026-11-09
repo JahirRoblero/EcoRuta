@@ -1,9 +1,25 @@
+import { use, useState } from "react";
+import Barra from "../../components/Inicio/Barra/Barra";
+import BarraLateral from "../../components/Inicio/BarraLateral/BarraLateral";
+import Footer from "../../components/Inicio/Footer/Footer";
+
 function Reportes() {
+  const [estaAbierto, setEstaAbierto] = useState(false);
+  const [reportes, setReportes] = useState([]);
+  const [cargandoReportes, setCargandoReportes] = useState(true);
+  const [errorReportes, setErrorReportes] = useState("");
+
   return (
-    <div>
-      <h1>Reportes</h1>
-      <p>Aquí se mostrarán los reportes de la comunidad.</p>
-    </div>
+    <>
+      <Barra estaAbierto={estaAbierto} alCerrar={() => setEstaAbierto(true)} />
+
+      <Footer></Footer>
+      <main></main>
+      <BarraLateral
+        alCerrar={() => setEstaAbierto(false)}
+        estaAbierto={estaAbierto}
+      ></BarraLateral>
+    </>
   );
 }
 

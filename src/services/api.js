@@ -73,6 +73,10 @@ export function obtenerReportesRecientes() {
   return apiFetch("/api/reportes/recientes");
 }
 
+export function obtenerReportesCompletos() {
+  return apiFetch("/api/reportes/todos-reportes");
+}
+
 export function obtenerMiRuta() {
   return apiFetch("/api/rutas/mi-ruta");
 }
