@@ -112,3 +112,7 @@ export function obtenerUrlImagen(imagenUrl) {
 
   return `${base}${ruta}`;
 }
+
+export function obtenerRutasDisponibles() {
+  return apiFetch("/api/rutas/disponibles");
+}

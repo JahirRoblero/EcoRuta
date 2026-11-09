@@ -6,7 +6,6 @@
 
 .contenido {
   flex-grow: 1;
-  margin-top: 100px;
 }
 .contenedorReportes {
   display: grid;
@@ -23,4 +22,13 @@
   .contenedorReportes {
     display: block;
   }
+}
+
+.tituloReportes {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 130px;
+  font-family: "Montserrat";
+  color: #9d2449;
 }

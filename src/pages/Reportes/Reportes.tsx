@@ -35,6 +35,10 @@ function Reportes() {
     <div className={styles.principal}>
       <Barra estaAbierto={estaAbierto} alCerrar={() => setEstaAbierto(true)} />
 
+      <div className={styles.tituloReportes}>
+        <h1>Reportes de vecinos</h1>
+      </div>
+
       <main className={styles.contenido}>
         {cargandoReportes && <p>Cargando reportes...</p>}
         {errorReportes && <p role="alert">{errorReportes}</p>}
