@@ -89,8 +89,8 @@ export default function Login() {
 
             <button
               className={styles.botonRegistro}
-              type="submit"
               onClick={() => navigate("/registro")}
+              type="button"
             >
               Registrate
             </button>

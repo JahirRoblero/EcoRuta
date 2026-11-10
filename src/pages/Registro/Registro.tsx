@@ -7,6 +7,7 @@ import logoEcorruta from "../../assets/img/LogoEcorrutaBlanco.png";
 
 import { registrarUsuario } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
+import Footer from "../../components/Inicio/Footer/Footer";
 
 interface RespuestaPostal {
   cp: string;
@@ -43,10 +44,6 @@ function Registro() {
   const [errorCP, setErrorCP] = useState("");
   const [error, setError] = useState("");
 
-  // =====================================
-  // CAMBIAR CÓDIGO POSTAL
-  // =====================================
-
   const cambiarCodigoPostal = (e: ChangeEvent<HTMLInputElement>) => {
     const valor = e.target.value.replace(/\D/g, "").slice(0, 5);
 
@@ -58,10 +55,6 @@ function Registro() {
     setErrorCP("");
     setBuscando(false);
   };
-
-  // =====================================
-  // CONSULTAR COLONIAS CON POSTALI
-  // =====================================
 
   useEffect(() => {
     if (!/^\d{5}$/.test(codigoPostal)) return;
@@ -124,10 +117,6 @@ function Registro() {
     return () => controlador.abort();
   }, [codigoPostal]);
 
-  // =====================================
-  // REGISTRAR USUARIO EN SPRING BOOT
-  // =====================================
-
   const manejarRegistro = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
@@ -161,10 +150,8 @@ function Registro() {
         confirmarContrasena,
       });
 
-      // El backend ya devuelve un JWT.
       guardarSesion(respuesta.token);
 
-      // Entrar automáticamente a EcoRuta.
       navigate("/rutas", { replace: true });
     } catch (err: unknown) {
       const fallo = err as Error & {
@@ -186,7 +173,7 @@ function Registro() {
   };
 
   return (
-    <main>
+    <main className={styles.contenedor}>
       <nav className={styles.barraContenedor}>
         <div className={styles["contenedor-izquierdo"]}>
           <img className={styles.logoOaxaca} src={logoEcorruta} alt="EcoRuta" />
@@ -198,61 +185,71 @@ function Registro() {
         </div>
       </nav>
 
-      <form onSubmit={manejarRegistro}>
-        <h2>Registro de ciudadano</h2>
+      <form onSubmit={manejarRegistro} className={styles.formulario}>
+        <h2 className={styles.tituloRegistro}>Registro de ciudadano</h2>
 
-        <label htmlFor="nombre">Nombre:</label>
-        <input
-          id="nombre"
-          type="text"
-          maxLength={60}
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          required
-        />
+        <div className={styles.grupoFormulario}>
+          <label htmlFor="nombre">Nombre:</label>
+          <input
+            id="nombre"
+            type="text"
+            maxLength={60}
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            required
+          />
+        </div>
 
-        <label htmlFor="apellidoPaterno">Apellido paterno:</label>
-        <input
-          id="apellidoPaterno"
-          type="text"
-          maxLength={60}
-          value={apellidoPaterno}
-          onChange={(e) => setApellidoPaterno(e.target.value)}
-          required
-        />
+        <div className={styles.grupoFormulario}>
+          <label htmlFor="apellidoPaterno">Apellido paterno:</label>
+          <input
+            id="apellidoPaterno"
+            type="text"
+            maxLength={60}
+            value={apellidoPaterno}
+            onChange={(e) => setApellidoPaterno(e.target.value)}
+            required
+          />
+        </div>
 
-        <label htmlFor="apellidoMaterno">Apellido materno:</label>
-        <input
-          id="apellidoMaterno"
-          type="text"
-          maxLength={60}
-          value={apellidoMaterno}
-          onChange={(e) => setApellidoMaterno(e.target.value)}
-        />
+        <div className={styles.grupoFormulario}>
+          <label htmlFor="apellidoMaterno">Apellido materno:</label>
+          <input
+            id="apellidoMaterno"
+            type="text"
+            maxLength={60}
+            value={apellidoMaterno}
+            onChange={(e) => setApellidoMaterno(e.target.value)}
+          />
+        </div>
 
-        <label htmlFor="correo">Correo electrónico:</label>
-        <input
-          id="correo"
-          type="email"
-          maxLength={254}
-          value={correo}
-          onChange={(e) => setCorreo(e.target.value)}
-          required
-        />
+        <div className={styles.grupoFormulario}>
+          <label htmlFor="correo">Correo electrónico:</label>
+          <input
+            id="correo"
+            type="email"
+            maxLength={254}
+            value={correo}
+            onChange={(e) => setCorreo(e.target.value)}
+            required
+          />
+        </div>
 
-        <label htmlFor="codigoPostal">Código postal:</label>
-        <input
-          id="codigoPostal"
-          type="text"
-          inputMode="numeric"
-          autoComplete="postal-code"
-          maxLength={5}
-          pattern="[0-9]{5}"
-          placeholder="68000"
-          value={codigoPostal}
-          onChange={cambiarCodigoPostal}
-          required
-        />
+        <div className={styles.grupoFormulario}>
+          <label htmlFor="codigoPostal">Código postal:</label>
+          <input
+            id="codigoPostal"
+            type="text"
+            inputMode="numeric"
+            autoComplete="postal-code"
+            maxLength={5}
+            pattern="[0-9]{5}"
+            placeholder="68000"
+            value={codigoPostal}
+            onChange={cambiarCodigoPostal}
+            required
+          />
+        </div>
 
         {buscando && <p>Buscando colonias...</p>}
 
@@ -262,62 +259,62 @@ function Registro() {
           </p>
         )}
 
-        {municipio && estado && (
-          <p>
-            {municipio}, {estado}
-          </p>
-        )}
-
-        <label htmlFor="colonia">Selecciona tu colonia:</label>
-        <select
-          id="colonia"
-          value={coloniaNombre}
-          onChange={(e) => setColoniaNombre(e.target.value)}
-          disabled={buscando || colonias.length === 0}
-          required
-        >
-          <option value="">
-            {buscando
-              ? "Buscando..."
-              : colonias.length
-                ? "Selecciona una colonia"
-                : "Ingresa primero tu código postal"}
-          </option>
-
-          {colonias.map((colonia) => (
-            <option key={colonia} value={colonia}>
-              {colonia}
+        <div className={styles.grupoFormulario}>
+          <label htmlFor="colonia">Selecciona tu colonia:</label>
+          <select
+            id="colonia"
+            value={coloniaNombre}
+            onChange={(e) => setColoniaNombre(e.target.value)}
+            disabled={buscando || colonias.length === 0}
+            required
+          >
+            <option value="">
+              {buscando
+                ? "Buscando..."
+                : colonias.length
+                  ? "Selecciona una colonia"
+                  : "Ingresa tu código postal"}
             </option>
-          ))}
-        </select>
 
-        <label htmlFor="contrasena">Contraseña:</label>
-        <input
-          id="contrasena"
-          type="password"
-          autoComplete="new-password"
-          minLength={8}
-          maxLength={72}
-          value={contrasena}
-          onChange={(e) => setContrasena(e.target.value)}
-          required
-        />
+            {colonias.map((colonia) => (
+              <option key={colonia} value={colonia}>
+                {colonia}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <label htmlFor="confirmarContrasena">Confirmar contraseña:</label>
-        <input
-          id="confirmarContrasena"
-          type="password"
-          autoComplete="new-password"
-          value={confirmarContrasena}
-          onChange={(e) => setConfirmarContrasena(e.target.value)}
-          required
-        />
+        <div className={styles.grupoFormulario}>
+          <label htmlFor="contrasena">Contraseña:</label>
+          <input
+            id="contrasena"
+            type="password"
+            autoComplete="new-password"
+            minLength={8}
+            maxLength={72}
+            value={contrasena}
+            onChange={(e) => setContrasena(e.target.value)}
+            required
+          />
+        </div>
 
-        {error && (
-          <p role="alert" style={{ color: "red" }}>
-            {error}
-          </p>
-        )}
+        <div className={styles.grupoFormulario}>
+          <label htmlFor="confirmarContrasena">Confirmar contraseña:</label>
+          <input
+            id="confirmarContrasena"
+            type="password"
+            autoComplete="new-password"
+            value={confirmarContrasena}
+            onChange={(e) => setConfirmarContrasena(e.target.value)}
+            required
+          />
+
+          {error && (
+            <p role="alert" style={{ color: "red" }}>
+              {error}
+            </p>
+          )}
+        </div>
 
         <button type="submit" disabled={registrando || buscando}>
           {registrando ? "Registrando..." : "Crear cuenta"}
@@ -327,6 +324,7 @@ function Registro() {
           ¿Ya tienes cuenta? <a href="/login">Iniciar sesión</a>
         </p>
       </form>
+      <Footer></Footer>
     </main>
   );
 }

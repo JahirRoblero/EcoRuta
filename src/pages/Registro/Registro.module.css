@@ -1,0 +1,166 @@
+@font-face {
+  font-family: "Montserrat";
+  src: url("../../assets/fonts/Montserrat-VariableFont_wght.ttf");
+}
+.contenedor {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.barraContenedor {
+  background-color: #9d2449;
+  position: fixed;
+  width: 100%;
+  z-index: 90;
+  top: 0;
+  left: 0;
+  display: flex;
+  gap: 30px;
+  padding: 20px;
+  border-top: 3px solid #b38e5d;
+  justify-content: space-between;
+}
+
+.contenedor-izquierdo {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.barraContenedor h1 {
+  color: white;
+}
+
+.barraContenedor p {
+  color: white;
+  font-family: "Montserrat";
+  font-size: 10px;
+  font-weight: bold;
+}
+.logoOaxaca {
+  width: 60px;
+}
+
+.boton-imagen {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.boton-imagen:hover {
+  transform: scale(1.09);
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  width: calc(100% - 32px);
+  padding: 35px;
+  max-width: 500px;
+  margin: 140px auto;
+  align-items: center;
+  margin-top: 140px;
+  font-family: "Montserrat";
+  border-radius: 10px;
+  box-sizing: border-box;
+  border: 0.1px solid #7d1c39;
+  flex-grow: 1;
+}
+.formulario * {
+  box-sizing: border-box;
+}
+.formulario input,
+.formulario select {
+  width: 100%;
+  padding: 12px;
+
+  border: 1px solid #bbb;
+  border-radius: 7px;
+  background-color: #fff;
+
+  font-family: "Montserrat", sans-serif;
+  font-size: 14px;
+
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+.grupoFormulario {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 70%;
+}
+
+.tituloRegistro {
+  color: #9d2449;
+}
+
+.formulario input:focus,
+.formulario select:focus {
+  border-color: #9d2449;
+  box-shadow: 0 0 0 3px rgba(157, 36, 73, 0.12);
+}
+
+.formulario select:disabled {
+  background-color: #f1f1f1;
+  cursor: not-allowed;
+}
+
+.formulario button[type="submit"] {
+  width: 100%;
+  padding: 13px;
+
+  border: none;
+  border-radius: 7px;
+  background-color: #9d2449;
+  color: white;
+
+  font-family: "Montserrat", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: 70%;
+}
+
+.formulario button[type="submit"]:hover:not(:disabled) {
+  background-color: #7d1c39;
+  width: 70%;
+}
+
+.formulario button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.formulario > p {
+  text-align: center;
+  font-size: 13px;
+  margin: 0;
+}
+
+.formulario a {
+  color: #9d2449;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.formulario a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .formulario {
+    margin-top: 130px;
+    padding: 22px;
+  }
+
+  .formulario h2 {
+    font-size: 20px;
+  }
+}
