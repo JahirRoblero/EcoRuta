@@ -9,6 +9,8 @@ import NoEncontrado from "./pages/NoEncontrado";
 import RutaProtegida from "./components/RutaProtegida";
 import Reportes from "./pages/Reportes/Reportes";
 import "./App.css";
+import PuntosBasura from "./pages/PuntosBasura/PuntosBasura";
+import Registro from "./pages/Registro/Registro";
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
         <Route path="/rutas" element={<Rutas />} />
         <Route path="/crear-reportes" element={<Quejas />} />
         <Route path="/reportes" element={<Reportes />} />
+        <Route path="/puntos-basura" element={<PuntosBasura />} />
+        <Route path="/registro" element={<Registro />} />
       </Route>
 
       <Route path="*" element={<NoEncontrado />} />

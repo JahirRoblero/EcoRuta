@@ -3,10 +3,15 @@ import { useNavigate } from "react-router";
 import styles from "./BarraLeteral.module.css";
 import cerrar from "../../../assets/img/cerrar.svg";
 
-function BarraLateral({ estaAbierto, alCerrar }) {
+interface BarraLateralProps {
+  estaAbierto: boolean;
+  alCerrar: () => void;
+}
+
+function BarraLateral({ estaAbierto, alCerrar }: BarraLateralProps) {
   const navegar = useNavigate();
 
-  const irA = (ruta) => {
+  const irA = (ruta: string) => {
     navegar(ruta);
     alCerrar();
   };

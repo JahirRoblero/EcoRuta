@@ -13,10 +13,28 @@ import { obtenerMiRuta } from "../services/api";
 import { obtenerUrlImagen } from "../services/api";
 import { useEffect, useState, useRef } from "react";
 
+interface Reporte {
+  idReporte: number;
+  titulo: string;
+  descripcion: string;
+  imagenUrl: string | null;
+  estado: string;
+  nombre: string;
+  coloniaNombre: string;
+  coloniaCodigoPostal: string;
+}
+
+interface RutaInicio {
+  nombre: string;
+  descripcion: string | null;
+  geometria: string;
+  deMiColonia: boolean;
+}
+
 function Inicio() {
   const [estaAbierto, setEstaAbierto] = useState(false);
 
-  const [reportes, setReportes] = useState([]);
+  const [reportes, setReportes] = useState<Reporte[]>([]);
   const [cargandoReportes, setCargandoReportes] = useState(true);
   const [errorReportes, setErrorReportes] = useState("");
 
@@ -31,9 +49,9 @@ function Inicio() {
   const [cargandoRuta, setCargandoRuta] = useState(true);
   const [errorRuta, setErrorRuta] = useState("");
 
-  const carruselRef = useRef(null);
+  const carruselRef = useRef<HTMLDivElement | null>(null);
 
-  const desplazarReportes = (direccion) => {
+  const desplazarReportes = (direccion: number) => {
     if (!carruselRef.current) return;
 
     carruselRef.current.scrollBy({
@@ -46,14 +64,11 @@ function Inicio() {
     let activo = true;
 
     obtenerReportesRecientes()
-      .then((datos) => {
+      .then((datos: Reporte[]) => {
         if (activo) setReportes(datos);
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         if (activo) setErrorReportes(error.message);
-      })
-      .finally(() => {
-        if (activo) setCargandoReportes(false);
       });
 
     return () => {
@@ -173,7 +188,7 @@ function Inicio() {
                   imagenQueja={obtenerUrlImagen(reporte.imagenUrl)}
                   nombre={reporte.nombre}
                   colonia={reporte.coloniaNombre}
-                  codigoPostal={reporte.coloniaCodigoPostals}
+                  codigoPostal={reporte.coloniaCodigoPostal}
                 />
               </div>
             ))}

@@ -1,9 +1,12 @@
 import styles from "./Barra.module.css";
-import logoOaxaca from "../../../assets/img/logoOaxacaOficial.png";
 import imagenBarra from "../../../assets/img/menu.svg";
 import logoEcorruta from "../../../assets/img/LogoEcorrutaBlanco.png";
+interface BarraProps {
+  estaAbierto: boolean;
+  alCerrar: () => void;
+}
 
-function Barra({ estaAbierto, alCerrar }) {
+function Barra({ alCerrar }: BarraProps) {
   return (
     <nav className={styles.barraContenedor}>
       <div className={styles["contenedor-izquierdo"]}>

@@ -116,3 +116,15 @@ export function obtenerUrlImagen(imagenUrl) {
 export function obtenerRutasDisponibles() {
   return apiFetch("/api/rutas/disponibles");
 }
+
+export function obtenerPuntosAcopio(opciones = {}) {
+  return apiFetch("/api/puntos-acopio", opciones);
+}
+
+export function registrarUsuario(datos) {
+  return apiFetch("/api/auth/registro", {
+    method: "POST",
+    requiereAuth: false,
+    body: JSON.stringify(datos),
+  });
+}

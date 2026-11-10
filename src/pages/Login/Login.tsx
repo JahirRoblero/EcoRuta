@@ -50,6 +50,11 @@ export default function Login() {
       </nav>
       <main className={styles["pagina-login"]}>
         <div className={styles.divisioniIzquierda}>
+          <img
+            className={styles.logisimo}
+            src={logoEcorrutaBlanco}
+            alt="Oaxaca Limpia"
+          ></img>
           <h1 className={styles.titulo}>Ingresa con tu e‑mail</h1>
 
           <form className={styles.formulario} onSubmit={manejarLogin}>
@@ -63,7 +68,6 @@ export default function Login() {
                 required
               />
             </div>
-
             <div>
               <label htmlFor="contrasena">Contraseña: </label>
               <input
@@ -74,11 +78,21 @@ export default function Login() {
                 required
               />
             </div>
-
             {error && <p role="alert">{error}</p>}
-
-            <button type="submit" disabled={cargando}>
+            <button
+              className={styles.botonIniciarSesion}
+              type="submit"
+              disabled={cargando}
+            >
               {cargando ? "Ingresando..." : "Iniciar sesión"}
+            </button>
+
+            <button
+              className={styles.botonRegistro}
+              type="submit"
+              onClick={() => navigate("/registro")}
+            >
+              Registrate
             </button>
           </form>
         </div>
