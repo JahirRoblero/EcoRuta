@@ -128,3 +128,11 @@ export function registrarUsuario(datos) {
     body: JSON.stringify(datos),
   });
 }
+
+export function enviarCodigoVerificacion(correo) {
+  return apiFetch("/api/auth/registro/enviar-codigo", {
+    method: "POST",
+    requiereAuth: false,
+    body: JSON.stringify({ correo }),
+  });
+}

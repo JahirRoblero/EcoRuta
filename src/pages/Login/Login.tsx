@@ -26,7 +26,7 @@ export default function Login() {
 
       guardarSesion(datos.token);
 
-      const destino = location.state?.from?.pathname || "/rutas";
+      const destino = location.state?.from?.pathname || "/";
 
       navigate(destino, { replace: true });
     } catch (error) {

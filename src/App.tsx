@@ -24,7 +24,6 @@ function App() {
         <Route path="/crear-reportes" element={<Quejas />} />
         <Route path="/reportes" element={<Reportes />} />
         <Route path="/puntos-basura" element={<PuntosBasura />} />
-        <Route path="/registro" element={<Registro />} />
       </Route>
 
       <Route path="*" element={<NoEncontrado />} />

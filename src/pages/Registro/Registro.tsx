@@ -4,8 +4,7 @@ import { useNavigate } from "react-router";
 
 import styles from "./Registro.module.css";
 import logoEcorruta from "../../assets/img/LogoEcorrutaBlanco.png";
-
-import { registrarUsuario } from "../../services/api";
+import { enviarCodigoVerificacion, registrarUsuario } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import Footer from "../../components/Inicio/Footer/Footer";
 
@@ -13,10 +12,7 @@ interface RespuestaPostal {
   cp: string;
   estado: string;
   municipio: string;
-  asentamientos: {
-    nombre: string;
-    tipo: string;
-  }[];
+  asentamientos: { nombre: string; tipo: string }[];
 }
 
 function Registro() {
@@ -27,26 +23,36 @@ function Registro() {
   const [apellidoPaterno, setApellidoPaterno] = useState("");
   const [apellidoMaterno, setApellidoMaterno] = useState("");
   const [correo, setCorreo] = useState("");
-
   const [codigoPostal, setCodigoPostal] = useState("");
   const [colonias, setColonias] = useState<string[]>([]);
   const [coloniaNombre, setColoniaNombre] = useState("");
-
   const [municipio, setMunicipio] = useState("");
   const [estado, setEstado] = useState("");
-
   const [contrasena, setContrasena] = useState("");
   const [confirmarContrasena, setConfirmarContrasena] = useState("");
+  const [codigoVerificacion, setCodigoVerificacion] = useState("");
 
   const [buscando, setBuscando] = useState(false);
+  const [enviando, setEnviando] = useState(false);
   const [registrando, setRegistrando] = useState(false);
-
+  const [codigoEnviado, setCodigoEnviado] = useState(false);
+  const [segundosEspera, setSegundosEspera] = useState(0);
   const [errorCP, setErrorCP] = useState("");
   const [error, setError] = useState("");
+  const [mensaje, setMensaje] = useState("");
+
+  const cambiarCorreo = (valor: string) => {
+    setCorreo(valor);
+    // Un código es válido solo para el correo al que se envió.
+    setCodigoEnviado(false);
+    setCodigoVerificacion("");
+    setSegundosEspera(0);
+    setMensaje("");
+    setError("");
+  };
 
   const cambiarCodigoPostal = (e: ChangeEvent<HTMLInputElement>) => {
     const valor = e.target.value.replace(/\D/g, "").slice(0, 5);
-
     setCodigoPostal(valor);
     setColoniaNombre("");
     setColonias([]);
@@ -58,19 +64,15 @@ function Registro() {
 
   useEffect(() => {
     if (!/^\d{5}$/.test(codigoPostal)) return;
-
     const controlador = new AbortController();
-
     async function buscarColonias() {
       setBuscando(true);
       setErrorCP("");
-
       try {
         const respuesta = await fetch(
           `https://postali.app/api/v1/mx/cp/${codigoPostal}`,
           { signal: controlador.signal },
         );
-
         if (!respuesta.ok) {
           throw new Error(
             respuesta.status === 404
@@ -78,27 +80,19 @@ function Registro() {
               : "No se pudieron consultar las colonias",
           );
         }
-
         const datos: RespuestaPostal = await respuesta.json();
-
         if (controlador.signal.aborted) return;
-
         const nombres = [
           ...new Set(
             (datos.asentamientos ?? []).map((a) => a.nombre).filter(Boolean),
           ),
         ].sort((a, b) => a.localeCompare(b, "es"));
-
         setColonias(nombres);
         setMunicipio(datos.municipio);
         setEstado(datos.estado);
-
-        if (nombres.length === 0) {
-          setErrorCP("No se encontraron colonias");
-        }
+        if (nombres.length === 0) setErrorCP("No se encontraron colonias");
       } catch (err: unknown) {
         if (controlador.signal.aborted) return;
-
         setColonias([]);
         setErrorCP(
           err instanceof Error
@@ -106,38 +100,78 @@ function Registro() {
             : "Error consultando el código postal",
         );
       } finally {
-        if (!controlador.signal.aborted) {
-          setBuscando(false);
-        }
+        if (!controlador.signal.aborted) setBuscando(false);
       }
     }
-
     buscarColonias();
-
     return () => controlador.abort();
   }, [codigoPostal]);
+
+  useEffect(() => {
+    if (segundosEspera <= 0) return;
+    const timer = window.setTimeout(
+      () => setSegundosEspera((s) => Math.max(0, s - 1)),
+      1000,
+    );
+    return () => window.clearTimeout(timer);
+  }, [segundosEspera]);
+
+  const validarFormulario = () => {
+    if (contrasena !== confirmarContrasena) {
+      setError("Las contraseñas no coinciden");
+      return false;
+    }
+    if (contrasena.length < 8) {
+      setError("La contraseña debe tener mínimo 8 caracteres");
+      return false;
+    }
+    if (!colonias.includes(coloniaNombre)) {
+      setError("Selecciona una colonia válida");
+      return false;
+    }
+    return true;
+  };
+
+  const solicitarCodigo = async () => {
+    setError("");
+    setMensaje("");
+    setEnviando(true);
+    try {
+      await enviarCodigoVerificacion(correo.trim().toLowerCase());
+      setCodigoEnviado(true);
+      setCodigoVerificacion("");
+      setSegundosEspera(60);
+      setMensaje(
+        "Si el correo puede registrarse, recibirás un código válido por 10 minutos. Revisa también spam.",
+      );
+    } catch (err: unknown) {
+      const fallo = err as Error & { status?: number };
+      setError(
+        fallo.status === 429
+          ? "Espera antes de solicitar otro código (máximo 5 envíos por hora)."
+          : "No se pudo enviar el correo. Inténtalo de nuevo.",
+      );
+    } finally {
+      setEnviando(false);
+    }
+  };
 
   const manejarRegistro = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
+    if (!validarFormulario()) return;
 
-    if (contrasena !== confirmarContrasena) {
-      setError("Las contraseñas no coinciden");
+    if (!codigoEnviado) {
+      await solicitarCodigo();
       return;
     }
 
-    if (contrasena.length < 8) {
-      setError("La contraseña debe tener mínimo 8 caracteres");
-      return;
-    }
-
-    if (!colonias.includes(coloniaNombre)) {
-      setError("Debes seleccionar una colonia válida");
+    if (!/^\d{5}$/.test(codigoVerificacion)) {
+      setError("Introduce el código de verificación de 5 dígitos");
       return;
     }
 
     setRegistrando(true);
-
     try {
       const respuesta = await registrarUsuario({
         nombre: nombre.trim(),
@@ -148,25 +182,22 @@ function Registro() {
         coloniaNombre,
         contrasena,
         confirmarContrasena,
+        codigoVerificacion,
       });
-
       guardarSesion(respuesta.token);
-
       navigate("/rutas", { replace: true });
     } catch (err: unknown) {
-      const fallo = err as Error & {
-        status?: number;
-      };
-
-      if (fallo.status === 409) {
-        setError("El correo ya está registrado");
-      } else if (fallo.status === 422) {
-        setError("La colonia seleccionada no está disponible en EcoRuta");
-      } else if (fallo.status === 400) {
-        setError("Revisa los datos del formulario");
-      } else {
-        setError("No se pudo crear la cuenta");
-      }
+      const fallo = err as Error & { status?: number };
+      if (fallo.status === 409) setError("Este correo ya está registrado");
+      else if (fallo.status === 422)
+        setError("La colonia no está registrada o está inactiva en EcoRuta");
+      else if (fallo.status === 429)
+        setError(
+          "Demasiados intentos. Solicita un código nuevo cuando sea posible.",
+        );
+      else if (fallo.status === 400)
+        setError("Código incorrecto o vencido, o datos inválidos.");
+      else setError("No se pudo crear la cuenta. Inténtalo nuevamente.");
     } finally {
       setRegistrando(false);
     }
@@ -177,7 +208,6 @@ function Registro() {
       <nav className={styles.barraContenedor}>
         <div className={styles["contenedor-izquierdo"]}>
           <img className={styles.logoOaxaca} src={logoEcorruta} alt="EcoRuta" />
-
           <div className="titulo">
             <h1>Ecorruta</h1>
             <p>GOBIERNO DEL ESTADO</p>
@@ -199,7 +229,6 @@ function Registro() {
             required
           />
         </div>
-
         <div className={styles.grupoFormulario}>
           <label htmlFor="apellidoPaterno">Apellido paterno:</label>
           <input
@@ -211,7 +240,6 @@ function Registro() {
             required
           />
         </div>
-
         <div className={styles.grupoFormulario}>
           <label htmlFor="apellidoMaterno">Apellido materno:</label>
           <input
@@ -222,7 +250,6 @@ function Registro() {
             onChange={(e) => setApellidoMaterno(e.target.value)}
           />
         </div>
-
         <div className={styles.grupoFormulario}>
           <label htmlFor="correo">Correo electrónico:</label>
           <input
@@ -230,11 +257,10 @@ function Registro() {
             type="email"
             maxLength={254}
             value={correo}
-            onChange={(e) => setCorreo(e.target.value)}
+            onChange={(e) => cambiarCorreo(e.target.value)}
             required
           />
         </div>
-
         <div className={styles.grupoFormulario}>
           <label htmlFor="codigoPostal">Código postal:</label>
           <input
@@ -252,10 +278,14 @@ function Registro() {
         </div>
 
         {buscando && <p>Buscando colonias...</p>}
-
         {errorCP && (
-          <p role="alert" style={{ color: "red" }}>
+          <p role="alert" className={styles.mensajeError}>
             {errorCP}
+          </p>
+        )}
+        {municipio && estado && (
+          <p className={styles.mensajeExito}>
+            {municipio}, {estado}
           </p>
         )}
 
@@ -275,7 +305,6 @@ function Registro() {
                   ? "Selecciona una colonia"
                   : "Ingresa tu código postal"}
             </option>
-
             {colonias.map((colonia) => (
               <option key={colonia} value={colonia}>
                 {colonia}
@@ -297,7 +326,6 @@ function Registro() {
             required
           />
         </div>
-
         <div className={styles.grupoFormulario}>
           <label htmlFor="confirmarContrasena">Confirmar contraseña:</label>
           <input
@@ -308,23 +336,68 @@ function Registro() {
             onChange={(e) => setConfirmarContrasena(e.target.value)}
             required
           />
-
-          {error && (
-            <p role="alert" style={{ color: "red" }}>
-              {error}
-            </p>
-          )}
         </div>
 
-        <button type="submit" disabled={registrando || buscando}>
-          {registrando ? "Registrando..." : "Crear cuenta"}
+        {codigoEnviado && (
+          <div className={styles.grupoFormulario}>
+            <label htmlFor="codigoVerificacion">
+              Código enviado al correo:
+            </label>
+            <input
+              id="codigoVerificacion"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              maxLength={5}
+              pattern="[0-9]{5}"
+              placeholder="5 dígitos"
+              value={codigoVerificacion}
+              onChange={(e) =>
+                setCodigoVerificacion(
+                  e.target.value.replace(/\D/g, "").slice(0, 5),
+                )
+              }
+              required
+            />
+            <button
+              className={styles.botonReenviar}
+              type="button"
+              onClick={solicitarCodigo}
+              disabled={enviando || registrando || segundosEspera > 0}
+            >
+              {segundosEspera > 0
+                ? `Reenviar código en ${segundosEspera}s`
+                : "Reenviar código"}
+            </button>
+          </div>
+        )}
+
+        {mensaje && (
+          <p className={styles.mensajeExito} role="status">
+            {mensaje}
+          </p>
+        )}
+        {error && (
+          <p className={styles.mensajeError} role="alert">
+            {error}
+          </p>
+        )}
+
+        <button type="submit" disabled={registrando || enviando || buscando}>
+          {registrando
+            ? "Creando cuenta..."
+            : enviando
+              ? "Enviando código..."
+              : codigoEnviado
+                ? "Verificar código y crear cuenta"
+                : "Enviar código de verificación"}
         </button>
 
         <p>
           ¿Ya tienes cuenta? <a href="/login">Iniciar sesión</a>
         </p>
       </form>
-      <Footer></Footer>
+      <Footer />
     </main>
   );
 }
