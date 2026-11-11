@@ -8,33 +8,73 @@ import {
 
 import type { ReactNode } from "react";
 
+export type Rol = "admin" | "operador" | "ciudadano";
+
 interface AuthContextType {
   token: string | null;
+  rol: Rol | null;
   estaAutenticado: boolean;
+  esAdmin: boolean;
+  esOperador: boolean;
   guardarSesion: (token: string) => void;
   cerrarSesion: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-function obtenerExpiracion(token: string): number | null {
+type PayloadJWT = {
+  exp?: unknown;
+  rol?: unknown;
+  rol_nombre?: unknown;
+  role?: unknown;
+};
+
+function decodificarPayload(token: string): PayloadJWT | null {
   try {
     const partes = token.split(".");
 
     if (partes.length !== 3) return null;
 
-    const payload = JSON.parse(
+    return JSON.parse(
       atob(partes[1].replace(/-/g, "+").replace(/_/g, "/")),
     );
-
-    if (typeof payload.exp !== "number" || !Number.isFinite(payload.exp)) {
-      return null;
-    }
-
-    return payload.exp * 1000;
   } catch {
     return null;
   }
+}
+
+function obtenerExpiracion(token: string): number | null {
+  const payload = decodificarPayload(token);
+
+  if (!payload) return null;
+
+  if (typeof payload.exp !== "number" || !Number.isFinite(payload.exp)) {
+    return null;
+  }
+
+  return payload.exp * 1000;
+}
+
+export function obtenerRol(token: string): Rol | null {
+  const payload = decodificarPayload(token);
+
+  if (!payload) return null;
+
+  const crudo = payload.rol ?? payload.rol_nombre ?? payload.role;
+
+  if (typeof crudo !== "string") return null;
+
+  const normalizado = crudo.trim().toLowerCase();
+
+  if (
+    normalizado === "admin" ||
+    normalizado === "operador" ||
+    normalizado === "ciudadano"
+  ) {
+    return normalizado;
+  }
+
+  return null;
 }
 
 function obtenerTokenInicial(): string | null {
@@ -54,6 +94,7 @@ function obtenerTokenInicial(): string | null {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(obtenerTokenInicial);
+  const rol = token ? obtenerRol(token) : null;
 
   const guardarSesion = useCallback((nuevoToken: string) => {
     const expiracion = obtenerExpiracion(nuevoToken);
@@ -136,7 +177,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         token,
+        rol,
         estaAutenticado: Boolean(token),
+        esAdmin: rol === "admin",
+        esOperador: rol === "operador",
         guardarSesion,
         cerrarSesion,
       }}

@@ -4,7 +4,15 @@ import styles from "./Login.module.css";
 import { iniciarSesion } from "../../services/api";
 import logoOaxaca from "../../assets/img/logoOaxacaOficial.png";
 import oaxacaLimpia from "../../assets/img/Oaxaca LimpiaVerde.png";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth, obtenerRol } from "../../context/AuthContext";
+import type { Rol } from "../../context/AuthContext";
+
+
+function destinoPorRol(rol: Rol | null): string {
+  if (rol === "admin") return "/admin";
+  if (rol === "operador") return "/operador";
+  return "/";
+}
 
 export default function Login() {
   const [correo, setCorreo] = useState("");
@@ -25,7 +33,9 @@ export default function Login() {
 
       guardarSesion(datos.token);
 
-      const destino = location.state?.from?.pathname || "/rutas";
+      const rolToken = obtenerRol(datos.token);
+      const destino =
+        location.state?.from?.pathname || destinoPorRol(rolToken);
 
       navigate(destino, { replace: true });
     } catch (error) {
