@@ -52,3 +52,51 @@
 .boton-imagen:hover {
   transform: scale(1.09);
 }
+
+.contenedorDerecho {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-family: "Montserrat";
+  gap: 5px;
+}
+
+.datosUsuario {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.nombreUsuario {
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.cerrarSesion {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #f0c5d1;
+  font-family: "Montserrat", sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cerrarSesion:hover {
+  color: white;
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  .nombreUsuario {
+    font-size: 12px;
+  }
+
+  .cerrarSesion {
+    font-size: 11px;
+  }
+}

@@ -61,7 +61,14 @@ function Reportes() {
           ))}
         </div>
       </main>
+      {estaAbierto && (
+        <div
+          className={styles.fondoOscuro}
+          onClick={() => setEstaAbierto(false)}
+        ></div>
+      )}
       <Footer></Footer>
+
       <BarraLateral
         alCerrar={() => setEstaAbierto(false)}
         estaAbierto={estaAbierto}

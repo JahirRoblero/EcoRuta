@@ -15,6 +15,16 @@ interface DatosReporte {
   descripcion: string;
 }
 
+interface RespuestaPostal {
+  cp: string;
+  estado: string;
+  municipio: string;
+  asentamientos: {
+    nombre: string;
+    tipo: string;
+  }[];
+}
+
 const datosIniciales: DatosReporte = {
   coloniaNombre: "",
   coloniaCodigoPostal: "",
@@ -23,12 +33,15 @@ const datosIniciales: DatosReporte = {
 };
 
 const TIPOS_PERMITIDOS = ["image/jpeg", "image/png", "image/webp"];
-
 const TAMANO_MAXIMO = 5 * 1024 * 1024;
 
 export default function Quejas() {
   const [estaAbierto, setEstaAbierto] = useState(false);
   const [datos, setDatos] = useState<DatosReporte>(datosIniciales);
+
+  const [colonias, setColonias] = useState<string[]>([]);
+  const [buscandoColonias, setBuscandoColonias] = useState(false);
+  const [errorCP, setErrorCP] = useState("");
 
   const [imagen, setImagen] = useState<File | null>(null);
   const [vistaPrevia, setVistaPrevia] = useState<string | null>(null);
@@ -37,6 +50,79 @@ export default function Quejas() {
   const [enviando, setEnviando] = useState(false);
   const [enviado, setEnviado] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const codigoPostal = datos.coloniaCodigoPostal;
+
+    if (!/^\d{5}$/.test(codigoPostal)) {
+      return;
+    }
+
+    const controlador = new AbortController();
+
+    const buscarColonias = async () => {
+      setBuscandoColonias(true);
+      setErrorCP("");
+
+      try {
+        const respuesta = await fetch(
+          `https://postali.app/api/v1/mx/cp/${codigoPostal}`,
+          { signal: controlador.signal },
+        );
+
+        if (!respuesta.ok) {
+          throw new Error(
+            respuesta.status === 404
+              ? "Código postal no encontrado."
+              : "No se pudieron consultar las colonias.",
+          );
+        }
+
+        const resultado: RespuestaPostal = await respuesta.json();
+
+        if (controlador.signal.aborted) return;
+
+        const nombres = [
+          ...new Set(
+            (resultado.asentamientos ?? [])
+              .map((colonia) => colonia.nombre.trim())
+              .filter(Boolean),
+          ),
+        ].sort((a, b) => a.localeCompare(b, "es"));
+
+        setColonias(nombres);
+
+        if (nombres.length === 1) {
+          setDatos((anterior) => ({
+            ...anterior,
+            coloniaNombre: nombres[0],
+          }));
+        }
+
+        if (nombres.length === 0) {
+          setErrorCP("No se encontraron colonias para este código postal.");
+        }
+      } catch (err) {
+        if (controlador.signal.aborted) return;
+
+        setColonias([]);
+
+        setErrorCP(
+          err instanceof Error
+            ? err.message
+            : "Error al consultar el código postal.",
+        );
+      } finally {
+        if (!controlador.signal.aborted) {
+          setBuscandoColonias(false);
+        }
+      }
+    };
+
+    buscarColonias();
+
+    return () => controlador.abort();
+  }, [datos.coloniaCodigoPostal]);
 
   useEffect(() => {
     if (!imagen) {
@@ -51,9 +137,24 @@ export default function Quejas() {
   }, [imagen]);
 
   const alCambiar = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.currentTarget;
+
+    if (name === "coloniaCodigoPostal") {
+      const codigoLimpio = value.replace(/\D/g, "").slice(0, 5);
+
+      setDatos((anterior) => ({
+        ...anterior,
+        coloniaCodigoPostal: codigoLimpio,
+        coloniaNombre: "",
+      }));
+
+      setColonias([]);
+      setErrorCP("");
+      setBuscandoColonias(false);
+      return;
+    }
 
     setDatos((anterior) => ({
       ...anterior,
@@ -81,7 +182,6 @@ export default function Quejas() {
 
   const alSeleccionarArchivo = (e: ChangeEvent<HTMLInputElement>) => {
     seleccionarImagen(e.currentTarget.files?.[0]);
-
     e.currentTarget.value = "";
   };
 
@@ -100,9 +200,19 @@ export default function Quejas() {
   const alEnviar = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setEnviando(true);
-    setEnviado(false);
     setError("");
+    setEnviado(false);
+
+    if (
+      !/^\d{5}$/.test(datos.coloniaCodigoPostal) ||
+      buscandoColonias ||
+      !colonias.includes(datos.coloniaNombre)
+    ) {
+      setError("Selecciona una colonia válida para tu código postal.");
+      return;
+    }
+
+    setEnviando(true);
 
     try {
       await crearReporte(
@@ -119,6 +229,8 @@ export default function Quejas() {
 
       setEnviado(true);
       setDatos({ ...datosIniciales });
+      setColonias([]);
+      setErrorCP("");
       setImagen(null);
     } catch (err) {
       setError(
@@ -131,6 +243,9 @@ export default function Quejas() {
 
   const alLimpiar = () => {
     setDatos({ ...datosIniciales });
+    setColonias([]);
+    setErrorCP("");
+    setBuscandoColonias(false);
     setImagen(null);
     setError("");
     setEnviado(false);
@@ -165,43 +280,74 @@ export default function Quejas() {
 
         <form className={styles.formulario} onSubmit={alEnviar}>
           <div className={styles.campo}>
+            <label className={styles.etiqueta} htmlFor="coloniaCodigoPostal">
+              Código postal *
+            </label>
+
+            <input
+              id="coloniaCodigoPostal"
+              name="coloniaCodigoPostal"
+              type="text"
+              className={styles.control}
+              value={datos.coloniaCodigoPostal}
+              onChange={alCambiar}
+              placeholder="Ej. 68130"
+              inputMode="numeric"
+              autoComplete="postal-code"
+              pattern="[0-9]{5}"
+              maxLength={5}
+              disabled={enviando}
+              required
+            />
+
+            {buscandoColonias && (
+              <small className={styles.mensajeCP} role="status">
+                Buscando colonias...
+              </small>
+            )}
+
+            {errorCP && (
+              <small className={styles.errorCP} role="alert">
+                {errorCP}
+              </small>
+            )}
+          </div>
+
+          <div className={styles.campo}>
             <label className={styles.etiqueta} htmlFor="coloniaNombre">
               Colonia *
             </label>
-            <input
+
+            <select
               id="coloniaNombre"
               name="coloniaNombre"
               className={styles.control}
               value={datos.coloniaNombre}
               onChange={alCambiar}
-              placeholder="Ej. Candiani"
-              maxLength={100}
+              disabled={buscandoColonias || enviando || colonias.length === 0}
               required
-            />
-          </div>
+            >
+              <option value="">
+                {buscandoColonias
+                  ? "Buscando colonias..."
+                  : colonias.length > 0
+                    ? "Selecciona tu colonia"
+                    : "Primero ingresa tu código postal"}
+              </option>
 
-          <div className={styles.campo}>
-            <label className={styles.etiqueta} htmlFor="coloniaCodigoPostal">
-              Código postal *
-            </label>
-            <input
-              id="coloniaCodigoPostal"
-              name="coloniaCodigoPostal"
-              className={styles.control}
-              value={datos.coloniaCodigoPostal}
-              onChange={alCambiar}
-              placeholder="68130"
-              inputMode="numeric"
-              pattern="[0-9]{5}"
-              maxLength={5}
-              required
-            />
+              {colonias.map((colonia) => (
+                <option key={colonia} value={colonia}>
+                  {colonia}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className={styles.campo}>
             <label className={styles.etiqueta} htmlFor="titulo">
               Título del reporte *
             </label>
+
             <input
               id="titulo"
               name="titulo"
@@ -210,6 +356,7 @@ export default function Quejas() {
               onChange={alCambiar}
               placeholder="Ej. Basura acumulada"
               maxLength={60}
+              disabled={enviando}
               required
             />
           </div>
@@ -218,6 +365,7 @@ export default function Quejas() {
             <label className={styles.etiqueta} htmlFor="descripcion">
               Descripción *
             </label>
+
             <textarea
               id="descripcion"
               name="descripcion"
@@ -226,6 +374,7 @@ export default function Quejas() {
               onChange={alCambiar}
               placeholder="Describe detalladamente la situación..."
               rows={5}
+              disabled={enviando}
               required
             />
           </div>
@@ -260,13 +409,17 @@ export default function Quejas() {
                   />
 
                   <p>{imagen?.name}</p>
+
                   <span>Haz clic para cambiar la imagen</span>
                 </>
               ) : (
                 <>
                   <span className={styles.iconoImagen}>+</span>
+
                   <strong>Arrastra tu imagen aquí</strong>
+
                   <span>O haz clic para seleccionar un archivo</span>
+
                   <small>JPG, PNG o WebP · Máximo 5 MB</small>
                 </>
               )}
@@ -297,7 +450,7 @@ export default function Quejas() {
             <button
               type="submit"
               className={styles["boton-primario"]}
-              disabled={enviando}
+              disabled={enviando || buscandoColonias}
             >
               {enviando ? "Enviando..." : "Enviar reporte"}
             </button>

@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router";
 import styles from "./Login.module.css";
 import { iniciarSesion } from "../../services/api";
-import logoOaxaca from "../../assets/img/logoOaxacaOficial.png";
-import oaxacaLimpia from "../../assets/img/Oaxaca LimpiaVerde.png";
 import logoEcorrutaBlanco from "../../assets/img/LogoEcorrutaCirculo.png";
+import logoEcorruta from "../../assets/img/LogoEcorrutaBlanco.png";
+import logoEcorruta2 from "../../assets/img/LogoEcorruta.png";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
@@ -15,6 +15,7 @@ export default function Login() {
   const { guardarSesion } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [mostrarAcercaDe, setMostrarAcercaDe] = useState(false);
 
   const manejarLogin = async (e) => {
     e.preventDefault();
@@ -40,11 +41,11 @@ export default function Login() {
     <>
       <nav className={styles.barraContenedor}>
         <div className={styles["contenedor-izquierdo"]}>
-          <img className={styles.logoOaxaca} src={logoOaxaca}></img>
+          <img className={styles.logoOaxaca} src={logoEcorruta}></img>
 
           <div className="titulo">
             <h1>Ecorruta</h1>
-            <p>GOBIERNO DEL ESTADO</p>
+            <p>POR UNA COLONIA MAS LIMPIA</p>
           </div>
         </div>
       </nav>
@@ -95,7 +96,81 @@ export default function Login() {
               Registrate
             </button>
           </form>
+
+          <div>
+            <button
+              type="button"
+              className={styles.acercaDe}
+              onClick={() => setMostrarAcercaDe(true)}
+            >
+              Acerca de Ecorruta
+            </button>
+          </div>
         </div>
+
+        {mostrarAcercaDe && (
+          <div
+            className={styles.fondoModal}
+            onClick={() => setMostrarAcercaDe(false)}
+          >
+            <div
+              className={styles.modalAcerca}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="tituloAcercaEcorruta"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                className={styles.cerrarModal}
+                onClick={() => setMostrarAcercaDe(false)}
+                aria-label="Cerrar"
+              >
+                ×
+              </button>
+
+              <h2 id="tituloAcercaEcorruta">¿Qué es Ecorruta?</h2>
+              <div className={styles.contenedorLogo2}>
+                <img src={logoEcorruta2} className={styles.logoEcorruta2}></img>
+              </div>
+
+              <p>
+                <strong>Ecorruta</strong> es una plataforma digital diseñada
+                para mejorar la gestión de residuos sólidos urbanos en Oaxaca de
+                Juárez.
+              </p>
+
+              <p>
+                Nuestro objetivo es facilitar el acceso a información sobre los
+                servicios de recolección de basura, promover la participación
+                ciudadana y contribuir al cuidado del medio ambiente.
+              </p>
+
+              <h3>¿Qué puedes hacer en Ecorruta?</h3>
+
+              <ul>
+                <li>Consultar las rutas de recolección de basura.</li>
+                <li>Conocer los horarios y días de recolección.</li>
+                <li>Localizar puntos de acopio de residuos.</li>
+                <li>Reportar problemas relacionados con la basura.</li>
+                <li>Consultar el estado de tus reportes.</li>
+              </ul>
+
+              <p>
+                En Ecorruta creemos que una ciudad más limpia comienza con la
+                participación de todos.
+              </p>
+
+              <button
+                type="button"
+                className={styles.botonEntendido}
+                onClick={() => setMostrarAcercaDe(false)}
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className={styles.divisionDerecha}>
           <img

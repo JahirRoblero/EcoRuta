@@ -105,7 +105,12 @@ function Rutas() {
       </main>
 
       <Footer />
-
+      {estaAbierto && (
+        <div
+          className={stylesRutas["fondo-oscuro"]}
+          onClick={() => setEstaAbierto(false)}
+        />
+      )}
       <BarraLateral
         alCerrar={() => setEstaAbierto(false)}
         estaAbierto={estaAbierto}

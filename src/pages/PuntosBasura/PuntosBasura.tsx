@@ -168,6 +168,12 @@ function PuntosBasura() {
     <main>
       <Barra estaAbierto={estaAbierto} alCerrar={() => setEstaAbierto(true)} />
 
+      {estaAbierto && (
+        <div
+          className={styles.estaAbierto}
+          onClick={() => setEstaAbierto(false)}
+        ></div>
+      )}
       <BarraLateral
         estaAbierto={estaAbierto}
         alCerrar={() => setEstaAbierto(false)}

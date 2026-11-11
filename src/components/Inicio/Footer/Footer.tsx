@@ -5,6 +5,7 @@ import web from "../../../assets/img/www.svg";
 import phone from "../../../assets/img/phone.svg";
 import o89 from "../../../assets/img/089.png";
 import emergencias from "../../../assets/img/911.png";
+import logoEcorruta from "../../../assets/img/LogoEcorruta.png";
 
 function Footer() {
   return (
@@ -12,7 +13,7 @@ function Footer() {
       <div className={styles["contenedor-general"]}>
         <div className={styles["contenedor-informacion"]}>
           <div className={styles.logoContenedor}>
-            <img className={styles.logoOaxaca} src={logoOaxaca}></img>
+            <img className={styles.logoOaxaca} src={logoEcorruta}></img>
             <h4>OAXACA</h4>
           </div>
           <div className={styles.contacto}>

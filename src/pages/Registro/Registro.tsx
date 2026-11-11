@@ -43,7 +43,6 @@ function Registro() {
 
   const cambiarCorreo = (valor: string) => {
     setCorreo(valor);
-    // Un código es válido solo para el correo al que se envió.
     setCodigoEnviado(false);
     setCodigoVerificacion("");
     setSegundosEspera(0);

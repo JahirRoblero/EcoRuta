@@ -1,0 +1,18 @@
+info:
+  name: Datos privados
+  type: http
+  seq: 10
+
+http:
+  method: GET
+  url: http://localhost:8080/api/auth/privado
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJwcnVlYmFAZWNvcnJ1dGEuY29tIiwicm9sIjoiQ0lVREFEQU5PIiwiaWF0IjoxNzk0MzY5MzQ5LCJleHAiOjE3OTQzNjk5NDl9.toxSVi6N25q-u0EvWnT7b6RnhP9wAQAQL9eSgem6X5ryICC6dCBblfpRx_Uz4_uu
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

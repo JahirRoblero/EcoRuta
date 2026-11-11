@@ -62,10 +62,12 @@ function Inicio() {
 
   useEffect(() => {
     let activo = true;
+    setCargandoReportes(true);
 
     obtenerReportesRecientes()
       .then((datos: Reporte[]) => {
         if (activo) setReportes(datos);
+        setCargandoReportes(false);
       })
       .catch((error: Error) => {
         if (activo) setErrorReportes(error.message);
