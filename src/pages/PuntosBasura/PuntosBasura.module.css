@@ -1,10 +1,10 @@
 .contenedor {
   max-width: 1500px;
-  margin: 0 auto;
-  padding: 120px 35px 35px;
+  margin: 140px;
   min-height: 100vh;
   box-sizing: border-box;
   background-color: #ffffff;
+  text-align: center;
 }
 
 .contenedor h1 {
@@ -18,7 +18,6 @@
 .contenedor > p {
   font-size: 16px;
   color: #666666;
-  margin: 0 0 25px;
   line-height: 1.6;
   font-family: "Montserrat";
 }

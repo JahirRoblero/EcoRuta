@@ -134,7 +134,7 @@ function Inicio() {
 
         <section className={stylesInicio.seccionReportes}>
           <div className={stylesInicio.encabezadoReportes}>
-            <h2>Reportes de la comunidad</h2>
+            <h2>Reportes recientes de los vecinos</h2>
 
             {reportes.length > 0 && (
               <div className={stylesInicio.controlesReportes}>

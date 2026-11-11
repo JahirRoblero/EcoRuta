@@ -11,6 +11,7 @@ import Reportes from "./pages/Reportes/Reportes";
 import "./App.css";
 import PuntosBasura from "./pages/PuntosBasura/PuntosBasura";
 import Registro from "./pages/Registro/Registro";
+import MiPerfil from "./pages/MiPerfil/MiPerfil";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/crear-reportes" element={<Quejas />} />
         <Route path="/reportes" element={<Reportes />} />
         <Route path="/puntos-basura" element={<PuntosBasura />} />
+        <Route path="/mi-perfil" element={<MiPerfil />} />
       </Route>
 
       <Route path="*" element={<NoEncontrado />} />

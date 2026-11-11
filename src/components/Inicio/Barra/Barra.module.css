@@ -73,6 +73,8 @@
   color: white;
   font-size: 15px;
   font-weight: 600;
+  background-color: transparent;
+  border: none;
 }
 
 .cerrarSesion {
@@ -99,4 +101,10 @@
   .cerrarSesion {
     font-size: 11px;
   }
+}
+
+.botonParaInicio {
+  padding: 0;
+  background-color: transparent;
+  border: none;
 }

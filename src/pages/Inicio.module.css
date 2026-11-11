@@ -143,9 +143,12 @@
   padding: 10px 20px;
   border-radius: 10px;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    color 0.2s;
+  transition: all 0.2s ease;
+}
+
+.realizarReporte:hover {
+  background-color: #8e1b1b;
+  transform: scale(1.01);
 }
 
 .rutaAsignada {

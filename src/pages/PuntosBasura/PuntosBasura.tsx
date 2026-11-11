@@ -183,8 +183,7 @@ function PuntosBasura() {
         <h1>Puntos de acopio</h1>
 
         <p>
-          Consulta los lugares disponibles para depositar residuos en Oaxaca de
-          Juárez.
+          Aqui se muestran los puntos de acopio disponibles en Oaxaca de juarez
         </p>
 
         <div className={styles.resumen}>

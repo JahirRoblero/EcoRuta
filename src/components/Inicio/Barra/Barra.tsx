@@ -47,7 +47,16 @@ function Barra({ alCerrar }: BarraProps) {
   return (
     <nav className={styles.barraContenedor}>
       <div className={styles["contenedor-izquierdo"]}>
-        <img className={styles.logoOaxaca} src={logoEcorruta} alt="Ecorruta" />
+        <button
+          className={styles.botonParaInicio}
+          onClick={() => (window.location.href = "/")}
+        >
+          <img
+            className={styles.logoOaxaca}
+            src={logoEcorruta}
+            alt="Ecorruta"
+          />
+        </button>
 
         <div className="titulo">
           <h1>Ecorruta</h1>
@@ -57,9 +66,12 @@ function Barra({ alCerrar }: BarraProps) {
 
       <div className={styles.contenedorDerecho}>
         <div className={styles.datosUsuario}>
-          <span className={styles.nombreUsuario}>
+          <button
+            className={styles.nombreUsuario}
+            onClick={() => (window.location.href = "mi-perfil")}
+          >
             {cargandoNombre ? "Cargando..." : `Hola, ${nombre || "Usuario"}`}
-          </span>
+          </button>
 
           <button
             type="button"
