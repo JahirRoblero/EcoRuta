@@ -37,7 +37,7 @@ function BarraLateral({ estaAbierto, alCerrar }: BarraLateralProps) {
 
         <button onClick={() => irA("/reportes")}>Reportes</button>
 
-        <button onClick={() => irA("/bandejas")}>Bandejas</button>
+        <button onClick={() => irA("/mi-perfil")}>Mi perfil</button>
       </div>
     </div>
   );

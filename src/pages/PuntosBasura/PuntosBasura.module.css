@@ -1,7 +1,11 @@
 .contenedor {
-  max-width: 1500px;
-  margin: 140px;
+  margin-top: 140px;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-left: 90px;
+  padding-right: 90px;
+  align-items: center;
   box-sizing: border-box;
   background-color: #ffffff;
   text-align: center;
@@ -25,6 +29,7 @@
 .resumen {
   display: flex;
   align-items: center;
+  text-align: center;
   gap: 5px;
   width: fit-content;
   margin-bottom: 25px;
