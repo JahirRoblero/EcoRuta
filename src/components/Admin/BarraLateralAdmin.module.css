@@ -1,0 +1,92 @@
+.barra {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 260px;
+  height: 100vh;
+  background-color: #9d2449;
+  border-right: 3px solid #b38e5d;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 0;
+  z-index: 100;
+}
+
+.encabezado {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.logo {
+  width: 48px;
+  height: auto;
+}
+
+.encabezado h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: white;
+}
+
+.encabezado p {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: #e9d5a6;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+  flex: 1;
+}
+
+.opcion {
+  display: block;
+  padding: 14px 24px;
+  color: white;
+  text-decoration: none;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border-left: 4px solid transparent;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.opcion:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.opcion.activo {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-left-color: #b38e5d;
+}
+
+.salir {
+  margin: 16px 20px 0;
+  padding: 12px;
+  background-color: transparent;
+  color: white;
+  border: 1px solid #b38e5d;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+.salir:hover {
+  background-color: #b38e5d;
+  color: #9d2449;
+}
