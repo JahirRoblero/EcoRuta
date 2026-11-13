@@ -20,19 +20,16 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Registro />} />
 
-      <Route element={<RutaProtegida roles={["CIUDADANO", "ADMINISTRADOR"]} />}>
+      <Route element={<RutaProtegida />}>
         <Route path="/" element={<Inicio />} />
         <Route path="/rutas" element={<Rutas />} />
         <Route path="/crear-reportes" element={<Quejas />} />
         <Route path="/reportes" element={<Reportes />} />
         <Route path="/puntos-basura" element={<PuntosBasura />} />
-      </Route>
-
-      <Route element={<RutaProtegida />}>
         <Route path="/mi-perfil" element={<MiPerfil />} />
       </Route>
 
-      <Route element={<RutaProtegida roles={["CONDUCTOR"]} />}>
+      <Route element={<RutaProtegida rolRequerido="operador" />}>
         <Route path="/operador" element={<PanelOperador />} />
       </Route>
 

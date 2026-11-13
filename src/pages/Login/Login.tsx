@@ -5,8 +5,14 @@ import { iniciarSesion } from "../../services/api";
 import logoEcorrutaBlanco from "../../assets/img/LogoEcorrutaCirculo.png";
 import logoEcorruta from "../../assets/img/LogoEcorrutaBlanco.png";
 import logoEcorruta2 from "../../assets/img/LogoEcorruta.png";
-import { useAuth } from "../../context/AuthContext";
-import { obtenerRol } from "../../services/sesion";
+import { useAuth, obtenerRol } from "../../context/AuthContext";
+import type { Rol } from "../../context/AuthContext";
+
+function destinoPorRol(rol: Rol | null): string {
+  if (rol === "admin") return "/admin";
+  if (rol === "operador") return "/operador";
+  return "/";
+}
 
 export default function Login() {
   const [correo, setCorreo] = useState("");
@@ -28,9 +34,10 @@ export default function Login() {
 
       guardarSesion(datos.token);
 
+      const rolToken = obtenerRol(datos.token);
       const destino =
-        obtenerRol(datos.token) === "CONDUCTOR"
-          ? "/operador"
+        rolToken === "operador" || rolToken === "admin"
+          ? destinoPorRol(rolToken)
           : location.state?.from?.pathname || "/";
 
       navigate(destino, { replace: true });
