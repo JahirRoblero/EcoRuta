@@ -136,3 +136,54 @@ export function enviarCodigoVerificacion(correo) {
     body: JSON.stringify({ correo }),
   });
 }
+
+// ------------------------------------------------------------
+// Operador (rol CONDUCTOR)
+// ------------------------------------------------------------
+
+export function obtenerEjecucionesOperador(fecha) {
+  const consulta = fecha ? `?fecha=${encodeURIComponent(fecha)}` : "";
+  return apiFetch(`/api/operador/ejecuciones${consulta}`);
+}
+
+export function iniciarRecorrido(folio) {
+  return apiFetch(`/api/operador/ejecuciones/${folio}/iniciar`, {
+    method: "POST",
+  });
+}
+
+export function finalizarRecorrido(folio, completado, observaciones) {
+  return apiFetch(`/api/operador/ejecuciones/${folio}/finalizar`, {
+    method: "POST",
+    body: JSON.stringify({ completado, observaciones }),
+  });
+}
+
+export function enviarUbicacion(folio, latitud, longitud) {
+  return apiFetch(`/api/operador/ejecuciones/${folio}/ubicaciones`, {
+    method: "POST",
+    body: JSON.stringify({ latitud, longitud }),
+  });
+}
+
+export function registrarIncidencia(folio, datos, imagen) {
+  const formulario = new FormData();
+
+  formulario.append(
+    "datos",
+    new Blob([JSON.stringify(datos)], { type: "application/json" }),
+  );
+
+  if (imagen) {
+    formulario.append("imagen", imagen, imagen.name);
+  }
+
+  return apiFetch(`/api/operador/ejecuciones/${folio}/incidencias`, {
+    method: "POST",
+    body: formulario,
+  });
+}
+
+export function obtenerIncidenciasEjecucion(folio) {
+  return apiFetch(`/api/operador/ejecuciones/${folio}/incidencias`);
+}

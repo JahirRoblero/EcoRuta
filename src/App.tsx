@@ -12,6 +12,7 @@ import "./App.css";
 import PuntosBasura from "./pages/PuntosBasura/PuntosBasura";
 import Registro from "./pages/Registro/Registro";
 import MiPerfil from "./pages/MiPerfil/MiPerfil";
+import PanelOperador from "./pages/Operador/PanelOperador";
 
 function App() {
   return (
@@ -19,13 +20,20 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Registro />} />
 
-      <Route element={<RutaProtegida />}>
+      <Route element={<RutaProtegida roles={["CIUDADANO", "ADMINISTRADOR"]} />}>
         <Route path="/" element={<Inicio />} />
         <Route path="/rutas" element={<Rutas />} />
         <Route path="/crear-reportes" element={<Quejas />} />
         <Route path="/reportes" element={<Reportes />} />
         <Route path="/puntos-basura" element={<PuntosBasura />} />
+      </Route>
+
+      <Route element={<RutaProtegida />}>
         <Route path="/mi-perfil" element={<MiPerfil />} />
+      </Route>
+
+      <Route element={<RutaProtegida roles={["CONDUCTOR"]} />}>
+        <Route path="/operador" element={<PanelOperador />} />
       </Route>
 
       <Route path="*" element={<NoEncontrado />} />

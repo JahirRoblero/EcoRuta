@@ -6,6 +6,7 @@ import logoEcorrutaBlanco from "../../assets/img/LogoEcorrutaCirculo.png";
 import logoEcorruta from "../../assets/img/LogoEcorrutaBlanco.png";
 import logoEcorruta2 from "../../assets/img/LogoEcorruta.png";
 import { useAuth } from "../../context/AuthContext";
+import { obtenerRol } from "../../services/sesion";
 
 export default function Login() {
   const [correo, setCorreo] = useState("");
@@ -27,7 +28,10 @@ export default function Login() {
 
       guardarSesion(datos.token);
 
-      const destino = location.state?.from?.pathname || "/";
+      const destino =
+        obtenerRol(datos.token) === "CONDUCTOR"
+          ? "/operador"
+          : location.state?.from?.pathname || "/";
 
       navigate(destino, { replace: true });
     } catch (error) {

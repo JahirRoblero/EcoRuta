@@ -7,9 +7,11 @@ import {
 } from "react";
 
 import type { ReactNode } from "react";
+import { obtenerRol } from "../services/sesion";
 
 interface AuthContextType {
   token: string | null;
+  rol: string | null;
   estaAutenticado: boolean;
   guardarSesion: (token: string) => void;
   cerrarSesion: () => void;
@@ -136,6 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         token,
+        rol: obtenerRol(token),
         estaAutenticado: Boolean(token),
         guardarSesion,
         cerrarSesion,

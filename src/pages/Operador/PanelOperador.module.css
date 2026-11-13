@@ -1,0 +1,393 @@
+.pagina {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: "Montserrat", sans-serif;
+  background-color: #f6f6f6;
+}
+
+/* Barra superior */
+.barra {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  background-color: #9d2449;
+  color: white;
+  flex-wrap: wrap;
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.marca h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.marca p {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+}
+
+.logo {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.usuario {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.usuario button {
+  padding: 8px 14px;
+  border: 1px solid white;
+  border-radius: 4px;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+}
+
+/* Contenido */
+.contenido {
+  flex: 1;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.encabezado h2 {
+  margin: 0;
+  color: #9d2449;
+}
+
+.selectorFecha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selectorFecha input {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.exito,
+.error,
+.vacio {
+  padding: 12px 14px;
+  border-radius: 6px;
+}
+
+.exito {
+  background-color: #e6f4ea;
+  color: #1e5e2f;
+}
+
+.error {
+  background-color: #fdecea;
+  color: #8a1c1c;
+}
+
+.vacio {
+  background-color: white;
+  border: 1px dashed #bbb;
+  text-align: center;
+}
+
+/* Tarjetas de ejecución */
+.lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.tarjeta {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-left: 5px solid #ccc;
+}
+
+.tarjetaActiva {
+  border-left-color: #2e7d32;
+}
+
+.tarjetaEncabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.tarjetaEncabezado h3 {
+  margin: 0;
+}
+
+.tarjeta p {
+  margin: 0;
+}
+
+.estado {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  background-color: #eee;
+}
+
+.estado_PENDIENTE {
+  background-color: #fff4d6;
+  color: #7a5a00;
+}
+
+.estado_EN_CURSO {
+  background-color: #e6f4ea;
+  color: #1e5e2f;
+}
+
+.estado_FINALIZADA {
+  background-color: #e3ecfa;
+  color: #1c3f7a;
+}
+
+.estado_CANCELADA {
+  background-color: #fdecea;
+  color: #8a1c1c;
+}
+
+.datos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 0;
+}
+
+.datos dt {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.datos dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.observaciones {
+  font-size: 0.9rem;
+  color: #555;
+  font-style: italic;
+}
+
+/* Botones */
+.botonPrimario,
+.botonPeligro,
+.botonSecundario {
+  padding: 10px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  border: none;
+}
+
+.botonPrimario {
+  background-color: #9d2449;
+  color: white;
+}
+
+.botonPeligro {
+  background-color: #b3261e;
+  color: white;
+}
+
+.botonSecundario {
+  background-color: white;
+  border: 1px solid #bbb;
+}
+
+.botonPrimario:disabled,
+.botonPeligro:disabled,
+.botonSecundario:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Paneles de recorrido en curso */
+.panel {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.panel h2 {
+  margin: 0;
+  color: #9d2449;
+  font-size: 1.2rem;
+}
+
+.panel h3 {
+  margin: 8px 0 0;
+  font-size: 1rem;
+}
+
+.gps {
+  padding: 12px;
+  border-radius: 6px;
+  background-color: #f1f1f1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gps p {
+  margin: 0;
+}
+
+.gpsActivo {
+  background-color: #e6f4ea;
+}
+
+.gpsError {
+  background-color: #fdecea;
+}
+
+.mapa {
+  height: 320px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.formulario label,
+.modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-weight: 600;
+}
+
+.formulario select,
+.formulario textarea,
+.formulario input[type="file"],
+.modal textarea {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: inherit;
+  font-weight: normal;
+}
+
+.archivo {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.incidencias {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.incidencias li {
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 6px;
+}
+
+.incidencias p {
+  margin: 4px 0 0;
+}
+
+/* Modal finalizar */
+.fondoModal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal h2 {
+  margin: 0;
+  color: #9d2449;
+}
+
+.modal p {
+  margin: 0;
+}
+
+.modal .opcion {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-weight: normal;
+}
+
+.accionesModal {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .barra {
+    padding: 10px 16px;
+  }
+
+  .usuario span {
+    display: none;
+  }
+}
