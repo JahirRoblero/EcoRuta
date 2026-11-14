@@ -38,13 +38,6 @@ function Inicio() {
   const [cargandoReportes, setCargandoReportes] = useState(true);
   const [errorReportes, setErrorReportes] = useState("");
 
-  interface RutaInicio {
-    nombre: string;
-    descripcion: string | null;
-    geometria: string;
-    deMiColonia: boolean;
-  }
-
   const [rutaActual, setRutaActual] = useState<RutaInicio | null>(null);
   const [cargandoRuta, setCargandoRuta] = useState(true);
   const [errorRuta, setErrorRuta] = useState("");
@@ -62,15 +55,17 @@ function Inicio() {
 
   useEffect(() => {
     let activo = true;
-    setCargandoReportes(true);
 
     obtenerReportesRecientes()
       .then((datos: Reporte[]) => {
         if (activo) setReportes(datos);
-        setCargandoReportes(false);
       })
       .catch((error: Error) => {
         if (activo) setErrorReportes(error.message);
+      })
+      .finally(() => {
+        // Antes solo se apagaba en el caso exitoso y con error se quedaba en "Cargando..."
+        if (activo) setCargandoReportes(false);
       });
 
     return () => {
