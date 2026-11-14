@@ -1,5 +1,11 @@
 import { useState } from "react";
+import type { FormEvent } from "react";
 import { useNavigate, useLocation } from "react-router";
+import {
+  limpiarCorreo,
+  validarCorreo,
+  validarObligatorio,
+} from "../../utils/validaciones";
 import styles from "./Login.module.css";
 import { iniciarSesion } from "../../services/api";
 import logoEcorrutaBlanco from "../../assets/img/LogoEcorrutaCirculo.png";
@@ -23,14 +29,33 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const [mostrarAcercaDe, setMostrarAcercaDe] = useState(false);
+  const [errorCorreo, setErrorCorreo] = useState("");
+  const [errorContrasena, setErrorContrasena] = useState("");
 
-  const manejarLogin = async (e) => {
+  const manejarLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
+
+    const fallaCorreo = validarCorreo(correo);
+    const fallaContrasena = validarObligatorio(contrasena, "La contraseña");
+
+    setErrorCorreo(fallaCorreo);
+    setErrorContrasena(fallaContrasena);
+
+    if (fallaCorreo || fallaContrasena) {
+      setError(
+        !correo.trim() || !contrasena
+          ? "Completa todos los campos obligatorios para iniciar sesión."
+          : "Revisa el campo marcado en rojo.",
+      );
+      document.getElementById(fallaCorreo ? "correo" : "contrasena")?.focus();
+      return;
+    }
+
     setCargando(true);
 
     try {
-      const datos = await iniciarSesion(correo, contrasena);
+      const datos = await iniciarSesion(correo.trim().toLowerCase(), contrasena);
 
       guardarSesion(datos.token);
 
@@ -41,8 +66,10 @@ export default function Login() {
           : location.state?.from?.pathname || "/";
 
       navigate(destino, { replace: true });
-    } catch (error) {
-      setError(error.message);
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error ? err.message : "No se pudo iniciar sesión.",
+      );
     } finally {
       setCargando(false);
     }
@@ -69,28 +96,77 @@ export default function Login() {
           ></img>
           <h1 className={styles.titulo}>Ingresa con tu e‑mail</h1>
 
-          <form className={styles.formulario} onSubmit={manejarLogin}>
+          <form
+            className={styles.formulario}
+            onSubmit={manejarLogin}
+            noValidate
+          >
             <div>
-              <label htmlFor="correo">Correo electrónico: </label>
+              <label htmlFor="correo">
+                Correo electrónico
+                <span className={styles.obligatorio} aria-hidden="true">
+                  {" "}
+                  *
+                </span>
+              </label>
               <input
                 id="correo"
                 type="email"
+                autoComplete="email"
+                placeholder="nombre@dominio.com"
+                maxLength={254}
                 value={correo}
-                onChange={(e) => setCorreo(e.target.value)}
+                className={errorCorreo ? styles.campoConError : undefined}
+                aria-invalid={Boolean(errorCorreo)}
+                aria-describedby={errorCorreo ? "correo-error" : undefined}
+                onChange={(e) => {
+                  setCorreo(limpiarCorreo(e.target.value));
+                  setErrorCorreo("");
+                }}
+                onBlur={() => correo && setErrorCorreo(validarCorreo(correo))}
                 required
               />
+              {errorCorreo && (
+                <small id="correo-error" className={styles.errorCampo}>
+                  {errorCorreo}
+                </small>
+              )}
             </div>
             <div>
-              <label htmlFor="contrasena">Contraseña: </label>
+              <label htmlFor="contrasena">
+                Contraseña
+                <span className={styles.obligatorio} aria-hidden="true">
+                  {" "}
+                  *
+                </span>
+              </label>
               <input
                 id="contrasena"
                 type="password"
+                autoComplete="current-password"
                 value={contrasena}
-                onChange={(e) => setContrasena(e.target.value)}
+                className={errorContrasena ? styles.campoConError : undefined}
+                aria-invalid={Boolean(errorContrasena)}
+                aria-describedby={
+                  errorContrasena ? "contrasena-error" : undefined
+                }
+                onChange={(e) => {
+                  setContrasena(e.target.value);
+                  setErrorContrasena("");
+                }}
                 required
               />
+              {errorContrasena && (
+                <small id="contrasena-error" className={styles.errorCampo}>
+                  {errorContrasena}
+                </small>
+              )}
             </div>
-            {error && <p role="alert">{error}</p>}
+            {error && (
+              <div className={styles.alerta} role="alert">
+                {error}
+              </div>
+            )}
             <button
               className={styles.botonIniciarSesion}
               type="submit"
