@@ -3,10 +3,15 @@ import { useNavigate } from "react-router";
 import styles from "./BarraLeteral.module.css";
 import cerrar from "../../../assets/img/cerrar.svg";
 
-function BarraLateral({ estaAbierto, alCerrar }) {
+interface BarraLateralProps {
+  estaAbierto: boolean;
+  alCerrar: () => void;
+}
+
+function BarraLateral({ estaAbierto, alCerrar }: BarraLateralProps) {
   const navegar = useNavigate();
 
-  const irA = (ruta) => {
+  const irA = (ruta: string) => {
     navegar(ruta);
     alCerrar();
   };
@@ -30,9 +35,9 @@ function BarraLateral({ estaAbierto, alCerrar }) {
 
         <button onClick={() => irA("/puntos-basura")}>Puntos de basura</button>
 
-        <button onClick={() => irA("/quejas")}>Reportes</button>
+        <button onClick={() => irA("/reportes")}>Reportes</button>
 
-        <button onClick={() => irA("/bandejas")}>Bandejas</button>
+        <button onClick={() => irA("/mi-perfil")}>Mi perfil</button>
       </div>
     </div>
   );

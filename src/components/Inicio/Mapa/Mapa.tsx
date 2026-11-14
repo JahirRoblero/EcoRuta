@@ -41,7 +41,8 @@ function obtenerCoordenadas(geometria: string): Coordenada[] {
 function Mapa({ geometria }: MapaProps) {
   const mapaContenedor = useRef<HTMLDivElement | null>(null);
   const mapa = useRef<mapboxgl.Map | null>(null);
-  const marcador = useRef<mapboxgl.Marker | null>(null);
+
+  const marcadores = useRef<mapboxgl.Marker[]>([]);
 
   const geometriaActual = useRef(geometria);
 
@@ -50,56 +51,26 @@ function Mapa({ geometria }: MapaProps) {
       try {
         const coordenadas = obtenerCoordenadas(geojson);
 
-        const datosRuta = {
-          type: "Feature" as const,
-          properties: {},
-          geometry: {
-            type: "LineString" as const,
-            coordinates: coordenadas,
-          },
-        };
+        marcadores.current.forEach((marcador) => {
+          marcador.remove();
+        });
 
-        const fuente = instancia.getSource("ruta-ecorruta") as
-          | mapboxgl.GeoJSONSource
-          | undefined;
+        marcadores.current = [];
 
-        if (fuente) {
-          fuente.setData(datosRuta);
-        } else {
-          instancia.addSource("ruta-ecorruta", {
-            type: "geojson",
-            data: datosRuta,
-          });
-
-          instancia.addLayer({
-            id: "linea-ruta-ecorruta",
-            type: "line",
-            source: "ruta-ecorruta",
-
-            layout: {
-              "line-join": "round",
-              "line-cap": "round",
-            },
-
-            paint: {
-              "line-color": "#9d2249",
-              "line-width": 5,
-              "line-opacity": 0.9,
-            },
-          });
-        }
-
-        const posicionInicial = coordenadas[0];
-
-        if (!marcador.current) {
-          marcador.current = new mapboxgl.Marker({
-            color: "#9d2249",
+        coordenadas.forEach((coordenada, indice) => {
+          const marcador = new mapboxgl.Marker({
+            color: "#9d2449",
           })
-            .setLngLat(posicionInicial)
+            .setLngLat(coordenada)
+            .setPopup(
+              new mapboxgl.Popup({
+                offset: 25,
+              }).setText(`Punto de referencia ${indice + 1}`),
+            )
             .addTo(instancia);
-        } else {
-          marcador.current.setLngLat(posicionInicial);
-        }
+
+          marcadores.current.push(marcador);
+        });
 
         const longitudes = coordenadas.map((punto) => punto[0]);
         const latitudes = coordenadas.map((punto) => punto[1]);
@@ -108,14 +79,6 @@ function Mapa({ geometria }: MapaProps) {
         const este = Math.max(...longitudes);
         const sur = Math.min(...latitudes);
         const norte = Math.max(...latitudes);
-
-        console.log("Coordenadas de la ruta:", coordenadas);
-        console.log("Límites del mapa:", {
-          oeste,
-          este,
-          sur,
-          norte,
-        });
 
         instancia.fitBounds(
           [
@@ -129,12 +92,11 @@ function Mapa({ geometria }: MapaProps) {
           },
         );
       } catch (error) {
-        console.error("Error al dibujar la ruta:", error);
+        console.error("Error al mostrar los puntos de la ruta:", error);
       }
     },
     [],
   );
-
   useEffect(() => {
     if (!mapaContenedor.current) return;
 
@@ -153,8 +115,11 @@ function Mapa({ geometria }: MapaProps) {
     });
 
     return () => {
-      marcador.current?.remove();
-      marcador.current = null;
+      marcadores.current.forEach((marcador) => {
+        marcador.remove();
+      });
+
+      marcadores.current = [];
 
       instancia.remove();
       mapa.current = null;

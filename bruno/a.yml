@@ -8,23 +8,18 @@ http:
   url: http://localhost:8080/api/auth/registro
   body:
     type: json
-    data: "
-
+    data: |
+      
       {
-
-      \    \"nombre\": \"Angel\",
-
-      \    \"apellidoPaterno\": \"Gomez\",
-
-      \    \"apellidoMaterno\": \"Roblero\",
-
-      \    \"correo\": \"angel@ecorruta.com\",
-
-      \    \"contrasena\": \"EcoRuta123!\"
-
+        "nombre": "Angel",
+        "apellidoPaterno": "Roblero",
+        "apellidoMaterno": "Gomez",
+        "correo": "prueba.ecorruta@example.com",
+        "codigoPostal": "68130",
+        "coloniaNombre": "Candiani",
+        "contrasena": "PruebaSegura2026!",
+        "confirmarContrasena": "PruebaSegura2026!"
       }
-
-      \  "
   auth: inherit
 
 settings:

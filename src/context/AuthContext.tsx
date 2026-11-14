@@ -55,6 +55,15 @@ function obtenerExpiracion(token: string): number | null {
   return payload.exp * 1000;
 }
 
+// Nombres de rol de la tabla "rol" en la BD -> rol usado en el front
+const ROLES_BD: Record<string, Rol> = {
+  administrador: "admin",
+  admin: "admin",
+  conductor: "operador",
+  operador: "operador",
+  ciudadano: "ciudadano",
+};
+
 export function obtenerRol(token: string): Rol | null {
   const payload = decodificarPayload(token);
 
@@ -64,17 +73,7 @@ export function obtenerRol(token: string): Rol | null {
 
   if (typeof crudo !== "string") return null;
 
-  const normalizado = crudo.trim().toLowerCase();
-
-  if (
-    normalizado === "admin" ||
-    normalizado === "operador" ||
-    normalizado === "ciudadano"
-  ) {
-    return normalizado;
-  }
-
-  return null;
+  return ROLES_BD[crudo.trim().toLowerCase()] ?? null;
 }
 
 function obtenerTokenInicial(): string | null {

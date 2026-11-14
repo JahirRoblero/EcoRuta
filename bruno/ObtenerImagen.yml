@@ -1,0 +1,18 @@
+info:
+  name: ObtenerImagen
+  type: http
+  seq: 6
+
+http:
+  method: GET
+  url: http://localhost:8080/api/reportes/imagenes/4aeb123a-5388-428c-a833-205e1e9ff0ce.png
+  auth:
+    type: bearer
+    token: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhbmdlbEBlY29ycnV0YS5jb20iLCJyb2wiOiJDSVVEQURBTk8iLCJpYXQiOjE3OTQxNzc0MTAsImV4cCI6MTc5NDE3ODAxMH0.LvbJeAdfaSI68a_DVZbKguq19KmI9erykXWk2vWsK_5x2zmtM_XkFJ9KJsEeHJpq
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

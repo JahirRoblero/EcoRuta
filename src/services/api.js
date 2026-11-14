@@ -73,6 +73,10 @@ export function obtenerReportesRecientes() {
   return apiFetch("/api/reportes/recientes");
 }
 
+export function obtenerReportesCompletos() {
+  return apiFetch("/api/reportes/todos-reportes");
+}
+
 export function obtenerMiRuta() {
   return apiFetch("/api/rutas/mi-ruta");
 }
@@ -107,4 +111,79 @@ export function obtenerUrlImagen(imagenUrl) {
   const ruta = imagenUrl.startsWith("/") ? imagenUrl : `/${imagenUrl}`;
 
   return `${base}${ruta}`;
+}
+
+export function obtenerRutasDisponibles() {
+  return apiFetch("/api/rutas/disponibles");
+}
+
+export function obtenerPuntosAcopio(opciones = {}) {
+  return apiFetch("/api/puntos-acopio", opciones);
+}
+
+export function registrarUsuario(datos) {
+  return apiFetch("/api/auth/registro", {
+    method: "POST",
+    requiereAuth: false,
+    body: JSON.stringify(datos),
+  });
+}
+
+export function enviarCodigoVerificacion(correo) {
+  return apiFetch("/api/auth/registro/enviar-codigo", {
+    method: "POST",
+    requiereAuth: false,
+    body: JSON.stringify({ correo }),
+  });
+}
+
+// ------------------------------------------------------------
+// Operador (rol CONDUCTOR)
+// ------------------------------------------------------------
+
+export function obtenerEjecucionesOperador(fecha) {
+  const consulta = fecha ? `?fecha=${encodeURIComponent(fecha)}` : "";
+  return apiFetch(`/api/operador/ejecuciones${consulta}`);
+}
+
+export function iniciarRecorrido(folio) {
+  return apiFetch(`/api/operador/ejecuciones/${folio}/iniciar`, {
+    method: "POST",
+  });
+}
+
+export function finalizarRecorrido(folio, completado, observaciones) {
+  return apiFetch(`/api/operador/ejecuciones/${folio}/finalizar`, {
+    method: "POST",
+    body: JSON.stringify({ completado, observaciones }),
+  });
+}
+
+export function enviarUbicacion(folio, latitud, longitud) {
+  return apiFetch(`/api/operador/ejecuciones/${folio}/ubicaciones`, {
+    method: "POST",
+    body: JSON.stringify({ latitud, longitud }),
+  });
+}
+
+export function registrarIncidencia(folio, datos, imagen) {
+  const formulario = new FormData();
+
+  formulario.append(
+    "datos",
+    new Blob([JSON.stringify(datos)], { type: "application/json" }),
+  );
+
+  if (imagen) {
+    formulario.append("imagen", imagen, imagen.name);
+  }
+
+  return apiFetch(`/api/operador/ejecuciones/${folio}/incidencias`, {
+    method: "POST",
+    body: formulario,
+  });
+}
+
+export function obtenerIncidenciasEjecucion(folio) {
+  return apiFetch(`/api/operador/ejecuciones/${folio}/incidencias`);
 }

@@ -1,0 +1,22 @@
+info:
+  name: ENVIARCORREO
+  type: http
+  seq: 9
+
+http:
+  method: POST
+  url: http://localhost:8080/api/auth/registro/enviar-codigo
+  body:
+    type: json
+    data: |-
+      {
+        "correo": "jahirgomezyt2@gmail.com"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

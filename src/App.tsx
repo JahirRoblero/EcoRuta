@@ -11,21 +11,33 @@ import Dashboard from "./pages/Admin/Dashboard";
 import Usuarios from "./pages/Admin/Usuarios";
 import Operadores from "./pages/Admin/Operadores";
 import RutasAdmin from "./pages/Admin/RutasAdmin";
-import Reportes from "./pages/Admin/Reportes";
+import ReportesAdmin from "./pages/Admin/Reportes";
 
 import RutaProtegida from "./components/RutaProtegida";
-
+import Reportes from "./pages/Reportes/Reportes";
 import "./App.css";
+import PuntosBasura from "./pages/PuntosBasura/PuntosBasura";
+import Registro from "./pages/Registro/Registro";
+import MiPerfil from "./pages/MiPerfil/MiPerfil";
+import PanelOperador from "./pages/Operador/PanelOperador";
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/registro" element={<Registro />} />
 
       <Route element={<RutaProtegida />}>
         <Route path="/" element={<Inicio />} />
         <Route path="/rutas" element={<Rutas />} />
-        <Route path="/reportes" element={<Quejas />} />
+        <Route path="/crear-reportes" element={<Quejas />} />
+        <Route path="/reportes" element={<Reportes />} />
+        <Route path="/puntos-basura" element={<PuntosBasura />} />
+        <Route path="/mi-perfil" element={<MiPerfil />} />
+      </Route>
+
+      <Route element={<RutaProtegida rolRequerido="operador" />}>
+        <Route path="/operador" element={<PanelOperador />} />
       </Route>
 
       <Route element={<RutaProtegida rolRequerido="admin" />}>
@@ -34,7 +46,7 @@ function App() {
           <Route path="usuarios" element={<Usuarios />} />
           <Route path="operadores" element={<Operadores />} />
           <Route path="rutas" element={<RutasAdmin />} />
-          <Route path="reportes" element={<Reportes />} />
+          <Route path="reportes" element={<ReportesAdmin />} />
         </Route>
       </Route>
 

@@ -11,7 +11,10 @@
 .imagen {
   width: 100%;
   max-width: 400px;
-  height: auto;
+  height: 220px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 8px;
   margin-bottom: 20px;
 }
 

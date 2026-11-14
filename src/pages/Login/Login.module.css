@@ -34,13 +34,21 @@
   width: 100%;
 }
 
-.formulario button {
+.botonIniciarSesion {
   padding: 10px;
   background-color: #9d2449;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.botonRegistro {
+  padding: 10px;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  border: 1px solid #bbbb;
 }
 
 .titulo {
@@ -108,4 +116,188 @@
   width: 100%;
   max-width: 400px;
   height: auto;
+}
+.logisimo {
+  width: 20%;
+  max-width: 400px;
+  height: auto;
+  display: none;
+}
+@media (max-width: 1000px) {
+  .divisionDerecha {
+    display: none;
+  }
+  .pagina-login {
+    padding: 50px;
+  }
+  .pagina-login h1 {
+    text-align: center;
+  }
+  .logisimo {
+    display: block;
+  }
+}
+
+.acercaDe {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  color: #9d2449;
+}
+
+.acercaDe:hover {
+  color: #7d1c39;
+}
+
+.fondoModal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  z-index: 9999;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.modalAcerca {
+  position: relative;
+  background-color: #ffffff;
+  color: #333333;
+  width: 100%;
+  max-width: 550px;
+  max-height: 85vh;
+  overflow-y: auto;
+
+  padding: 35px;
+  border-radius: 12px;
+  box-sizing: border-box;
+  font-family: "Montserrat", sans-serif;
+
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2);
+}
+
+.modalAcerca h2 {
+  color: #9d2449;
+  font-size: 25px;
+  margin: 0 0 20px;
+  text-align: center;
+}
+
+.modalAcerca h3 {
+  color: #9d2449;
+  font-size: 18px;
+  margin: 20px 0 12px;
+}
+
+.modalAcerca p {
+  font-size: 14px;
+  line-height: 1.8;
+  margin-bottom: 15px;
+}
+
+.modalAcerca ul {
+  padding-left: 22px;
+  margin-bottom: 20px;
+}
+
+.modalAcerca li {
+  font-size: 14px;
+  line-height: 1.8;
+  margin-bottom: 8px;
+}
+
+.cerrarModal {
+  position: absolute;
+  top: 12px;
+  right: 17px;
+  background: transparent;
+  border: none;
+  color: #777777;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.cerrarModal:hover {
+  color: #9d2449;
+}
+
+.botonEntendido {
+  display: block;
+  margin: 25px auto 0;
+  padding: 12px 35px;
+
+  background-color: #9d2449;
+  color: white;
+  border: none;
+  border-radius: 8px;
+
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.botonEntendido:hover {
+  background-color: #7d1c39;
+}
+
+@media (max-width: 600px) {
+  .modalAcerca {
+    padding: 30px 20px;
+    max-height: 85dvh;
+  }
+
+  .modalAcerca h2 {
+    font-size: 21px;
+  }
+
+  .modalAcerca p,
+  .modalAcerca li {
+    font-size: 13px;
+  }
+}
+.contenedorLogo2 {
+  display: flex;
+  justify-content: center;
+}
+.logoEcorruta2 {
+  width: 100px;
+}
+
+/* Validaciones del formulario */
+.obligatorio {
+  color: #d32f2f;
+  font-weight: 700;
+}
+
+.formulario input.campoConError,
+.formulario input.campoConError:focus {
+  border-color: #d32f2f;
+  background-color: #fff6f6;
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.12);
+  outline: none;
+}
+
+.errorCampo {
+  display: block;
+  margin-top: 4px;
+  color: #d32f2f;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.alerta {
+  padding: 10px 12px;
+  border: 1px solid #f5c2c2;
+  border-left: 5px solid #d32f2f;
+  border-radius: 4px;
+  background-color: #fdecea;
+  color: #8a1c1c;
+  font-size: 14px;
+  font-weight: 600;
 }

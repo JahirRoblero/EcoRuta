@@ -13,27 +13,38 @@ import { obtenerMiRuta } from "../services/api";
 import { obtenerUrlImagen } from "../services/api";
 import { useEffect, useState, useRef } from "react";
 
+interface Reporte {
+  idReporte: number;
+  titulo: string;
+  descripcion: string;
+  imagenUrl: string | null;
+  estado: string;
+  nombre: string;
+  coloniaNombre: string;
+  coloniaCodigoPostal: string;
+}
+
+interface RutaInicio {
+  nombre: string;
+  descripcion: string | null;
+  geometria: string;
+  deMiColonia: boolean;
+}
+
 function Inicio() {
   const [estaAbierto, setEstaAbierto] = useState(false);
 
-  const [reportes, setReportes] = useState([]);
+  const [reportes, setReportes] = useState<Reporte[]>([]);
   const [cargandoReportes, setCargandoReportes] = useState(true);
   const [errorReportes, setErrorReportes] = useState("");
-
-  interface RutaInicio {
-    nombre: string;
-    descripcion: string | null;
-    geometria: string;
-    deMiColonia: boolean;
-  }
 
   const [rutaActual, setRutaActual] = useState<RutaInicio | null>(null);
   const [cargandoRuta, setCargandoRuta] = useState(true);
   const [errorRuta, setErrorRuta] = useState("");
 
-  const carruselRef = useRef(null);
+  const carruselRef = useRef<HTMLDivElement | null>(null);
 
-  const desplazarReportes = (direccion) => {
+  const desplazarReportes = (direccion: number) => {
     if (!carruselRef.current) return;
 
     carruselRef.current.scrollBy({
@@ -46,13 +57,14 @@ function Inicio() {
     let activo = true;
 
     obtenerReportesRecientes()
-      .then((datos) => {
+      .then((datos: Reporte[]) => {
         if (activo) setReportes(datos);
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         if (activo) setErrorReportes(error.message);
       })
       .finally(() => {
+        // Antes solo se apagaba en el caso exitoso y con error se quedaba en "Cargando..."
         if (activo) setCargandoReportes(false);
       });
 
@@ -96,15 +108,15 @@ function Inicio() {
         </div>
 
         <InformacionRuta ruta={rutaActual?.nombre ?? "SIN RUTA"} />
-
         {rutaActual && (
-          <p>
-            {rutaActual.deMiColonia
-              ? "Ruta asignada a tu colonia"
-              : "Mostrando una ruta alternativa disponible"}
-          </p>
+          <div className={stylesInicio.rutaAsignada}>
+            <p>
+              {rutaActual.deMiColonia
+                ? "Ruta asignada a tu colonia"
+                : "Mostrando una ruta alternativa disponible"}
+            </p>
+          </div>
         )}
-
         <div className={stylesInicio["contenedor-mapa"]}>
           {cargandoRuta && <p>Cargando ruta...</p>}
 
@@ -117,7 +129,7 @@ function Inicio() {
 
         <section className={stylesInicio.seccionReportes}>
           <div className={stylesInicio.encabezadoReportes}>
-            <h2>Reportes de la comunidad</h2>
+            <h2>Reportes recientes de los vecinos</h2>
 
             {reportes.length > 0 && (
               <div className={stylesInicio.controlesReportes}>
@@ -171,6 +183,9 @@ function Inicio() {
                   tituloQueja={reporte.titulo}
                   descripcionQueja={reporte.descripcion}
                   imagenQueja={obtenerUrlImagen(reporte.imagenUrl)}
+                  nombre={reporte.nombre}
+                  colonia={reporte.coloniaNombre}
+                  codigoPostal={reporte.coloniaCodigoPostal}
                 />
               </div>
             ))}
