@@ -5,6 +5,7 @@ import Mapa from "../components/Inicio/Mapa/Mapa";
 import InformacionRuta from "../components/Inicio/InformacionRuta/InformacionRuta";
 import Footer from "../components/Inicio/Footer/Footer";
 import QuejasRapidas from "../components/Inicio/QuejasRapidas/QuejasRapidas";
+import SeguimientoCamion from "../components/Inicio/SeguimientoCamion/SeguimientoCamion";
 import menorque from "../assets/img/menorque.svg";
 import mayorque from "../assets/img/mayorque.svg";
 import { obtenerReportesRecientes } from "../services/api";
@@ -126,6 +127,8 @@ function Inicio() {
             <Mapa geometria={rutaActual.geometria} />
           )}
         </div>
+
+        <SeguimientoCamion />
 
         <section className={stylesInicio.seccionReportes}>
           <div className={stylesInicio.encabezadoReportes}>

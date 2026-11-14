@@ -191,3 +191,8 @@ export function obtenerIncidenciasEjecucion(folio) {
 export function obtenerUbicacionesEjecucion(folio) {
   return apiFetch(`/api/operador/ejecuciones/${folio}/ubicaciones`);
 }
+
+// Seguimiento ciudadano: dónde va el camión de mi colonia (HU-22)
+export function obtenerSeguimientoMiColonia() {
+  return apiFetch("/api/seguimiento/mi-colonia");
+}

@@ -16,6 +16,8 @@ interface MapaRecorridoProps {
   posicionActual: Coordenada | null;
   /** Centrar el mapa en la unidad cada vez que se mueve. */
   seguir: boolean;
+  /** Mostrar "Recorrido real (GPS)" en la leyenda (no aplica en la vista ciudadana). */
+  mostrarRecorrido?: boolean;
 }
 
 interface Datos {
@@ -77,6 +79,7 @@ function MapaRecorrido({
   recorrido,
   posicionActual,
   seguir,
+  mostrarRecorrido = true,
 }: MapaRecorridoProps) {
   const contenedor = useRef<HTMLDivElement | null>(null);
   const mapa = useRef<mapboxgl.Map | null>(null);
@@ -203,9 +206,11 @@ function MapaRecorrido({
         <li>
           <span className={styles.leyendaPlaneada} /> Ruta planeada
         </li>
-        <li>
-          <span className={styles.leyendaReal} /> Recorrido real (GPS)
-        </li>
+        {mostrarRecorrido && (
+          <li>
+            <span className={styles.leyendaReal} /> Recorrido real (GPS)
+          </li>
+        )}
         <li>
           <span aria-hidden="true">🚛</span> Unidad
         </li>
