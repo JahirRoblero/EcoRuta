@@ -187,3 +187,7 @@ export function registrarIncidencia(folio, datos, imagen) {
 export function obtenerIncidenciasEjecucion(folio) {
   return apiFetch(`/api/operador/ejecuciones/${folio}/incidencias`);
 }
+
+export function obtenerUbicacionesEjecucion(folio) {
+  return apiFetch(`/api/operador/ejecuciones/${folio}/ubicaciones`);
+}
