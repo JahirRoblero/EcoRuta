@@ -187,3 +187,12 @@ export function registrarIncidencia(folio, datos, imagen) {
 export function obtenerIncidenciasEjecucion(folio) {
   return apiFetch(`/api/operador/ejecuciones/${folio}/incidencias`);
 }
+
+export function obtenerUbicacionesEjecucion(folio) {
+  return apiFetch(`/api/operador/ejecuciones/${folio}/ubicaciones`);
+}
+
+// Seguimiento ciudadano: dónde va el camión de mi colonia (HU-22)
+export function obtenerSeguimientoMiColonia() {
+  return apiFetch("/api/seguimiento/mi-colonia");
+}
