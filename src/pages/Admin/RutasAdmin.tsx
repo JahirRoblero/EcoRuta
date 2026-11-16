@@ -1,22 +1,33 @@
 import { useEffect, useState, useMemo } from "react";
 import styles from "./RutasAdmin.module.css";
+import ModalConfirmacion from "../../components/Admin/ModalConfirmacion";
 import {
   obtenerRutas,
   desactivarRuta,
   activarRuta,
   eliminarRuta,
-} from "../../services/adminApi";
+} from "../../services/adminRutasApi";
 
 interface Ruta {
   nombre: string;
   descripcion: string | null;
-  distancia_km: number | null;
+  distanciaKm: number | null;
   activo: boolean;
-  fecha_creacion: string;
-  colonias: number;
+  fechaCreacion: string;
+  totalColonias: number;
 }
 
 type FiltroEstado = "todas" | "activas" | "inactivas";
+
+function mensajeDeError(error: unknown): string {
+  const estado = (error as { status?: number } | null)?.status;
+  if (estado === 403) return "No tienes permisos para administrar rutas.";
+  if (estado === 404) return "La ruta ya no existe.";
+  if (estado === 409) {
+    return "No se puede eliminar: la ruta tiene horarios o recorridos registrados. Desactívala en su lugar.";
+  }
+  return "No se pudo conectar con el servidor. Intenta de nuevo.";
+}
 
 export default function RutasAdmin() {
   const [rutas, setRutas] = useState<Ruta[]>([]);
@@ -25,13 +36,14 @@ export default function RutasAdmin() {
   const [busqueda, setBusqueda] = useState("");
   const [filtroEstado, setFiltroEstado] = useState<FiltroEstado>("todas");
   const [procesando, setProcesando] = useState<string | null>(null);
+  const [rutaAEliminar, setRutaAEliminar] = useState<Ruta | null>(null);
 
   const cargarRutas = () => {
     setCargando(true);
     setError("");
     obtenerRutas()
       .then((datos: Ruta[]) => setRutas(datos))
-      .catch((err: Error) => setError(err.message))
+      .catch((err: unknown) => setError(mensajeDeError(err)))
       .finally(() => setCargando(false));
   };
 
@@ -54,6 +66,7 @@ export default function RutasAdmin() {
 
   const cambiarEstado = async (ruta: Ruta) => {
     setProcesando(ruta.nombre);
+    setError("");
     try {
       if (ruta.activo) {
         await desactivarRuta(ruta.nombre);
@@ -62,23 +75,23 @@ export default function RutasAdmin() {
       }
       cargarRutas();
     } catch (err) {
-      setError((err as Error).message);
+      setError(mensajeDeError(err));
     } finally {
       setProcesando(null);
     }
   };
 
-  const confirmarEliminar = async (ruta: Ruta) => {
-    const ok = window.confirm(
-      `¿Eliminar la ruta "${ruta.nombre}"? Esta acción no se puede deshacer.`,
-    );
-    if (!ok) return;
-    setProcesando(ruta.nombre);
+  const confirmarEliminar = async () => {
+    if (!rutaAEliminar) return;
+    const { nombre } = rutaAEliminar;
+    setRutaAEliminar(null);
+    setProcesando(nombre);
+    setError("");
     try {
-      await eliminarRuta(ruta.nombre);
+      await eliminarRuta(nombre);
       cargarRutas();
     } catch (err) {
-      setError((err as Error).message);
+      setError(mensajeDeError(err));
     } finally {
       setProcesando(null);
     }
@@ -135,7 +148,7 @@ export default function RutasAdmin() {
         <p className={styles.estado}>No se encontraron rutas.</p>
       )}
 
-      {!cargando && !error && rutasFiltradas.length > 0 && (
+      {!cargando && rutasFiltradas.length > 0 && (
         <div className={styles.contenedorTabla}>
           <table className={styles.tabla}>
             <thead>
@@ -157,9 +170,9 @@ export default function RutasAdmin() {
                     {ruta.descripcion || "—"}
                   </td>
                   <td>
-                    {ruta.distancia_km ? `${ruta.distancia_km} km` : "—"}
+                    {ruta.distanciaKm != null ? `${ruta.distanciaKm} km` : "—"}
                   </td>
-                  <td>{ruta.colonias}</td>
+                  <td>{ruta.totalColonias}</td>
                   <td>
                     <span
                       className={`${styles.badge} ${
@@ -171,7 +184,7 @@ export default function RutasAdmin() {
                       {ruta.activo ? "Activa" : "Inactiva"}
                     </span>
                   </td>
-                  <td>{formatearFecha(ruta.fecha_creacion)}</td>
+                  <td>{formatearFecha(ruta.fechaCreacion)}</td>
                   <td className={styles.acciones}>
                     <button
                       type="button"
@@ -192,7 +205,7 @@ export default function RutasAdmin() {
                     <button
                       type="button"
                       className={styles.botonPeligro}
-                      onClick={() => confirmarEliminar(ruta)}
+                      onClick={() => setRutaAEliminar(ruta)}
                       disabled={procesando === ruta.nombre}
                     >
                       Eliminar
@@ -204,6 +217,15 @@ export default function RutasAdmin() {
           </table>
         </div>
       )}
+
+      <ModalConfirmacion
+        abierto={rutaAEliminar !== null}
+        titulo="Eliminar ruta"
+        mensaje={`¿Eliminar la ruta "${rutaAEliminar?.nombre ?? ""}"? Esta acción no se puede deshacer.`}
+        textoConfirmar="Eliminar"
+        onConfirmar={confirmarEliminar}
+        onCancelar={() => setRutaAEliminar(null)}
+      />
     </div>
   );
 }
