@@ -57,3 +57,40 @@
 .sinAccion {
   color: #aaa;
 }
+
+/* ===== Nuevo: conexión con backend ===== */
+
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border: 1px solid #f1b5b5;
+  border-radius: 6px;
+  background-color: #fdecec;
+  color: #9b1c1c;
+}
+
+.botonActivar {
+  background: white;
+  border: 1px solid #1e7a3c;
+  color: #1e7a3c;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.botonActivar:hover {
+  background-color: #1e7a3c;
+  color: white;
+}
+
+.botonActivar:disabled,
+.botonDesactivar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
