@@ -1,43 +1,126 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import TablaDatos from "../../components/Admin/TablaDatos";
 import type { Columna } from "../../components/Admin/TablaDatos";
 import ModalConfirmacion from "../../components/Admin/ModalConfirmacion";
+import {
+  obtenerUsuarios,
+  activarUsuario,
+  desactivarUsuario,
+} from "../../services/adminUsuariosApi";
 import styles from "./Usuarios.module.css";
+
+type RolBD = "ADMINISTRADOR" | "CONDUCTOR" | "CIUDADANO";
 
 interface Usuario {
   correo: string;
   nombre: string;
-  apellido_paterno: string;
-  rol_nombre: "ADMINISTRADOR" | "OPERADOR" | "CIUDADANO";
-  colonia_nombre: string | null;
+  apellidoPaterno: string;
+  apellidoMaterno: string | null;
+  rol: RolBD;
   activo: boolean;
+  coloniaNombre: string | null;
+  coloniaCodigoPostal: string | null;
+  fechaRegistro: string;
 }
 
-const USUARIOS_PRUEBA: Usuario[] = [
-  { correo: "maria.lopez@correo.com", nombre: "María", apellido_paterno: "López", rol_nombre: "CIUDADANO", colonia_nombre: "Reforma", activo: true },
-  { correo: "juan.perez@correo.com", nombre: "Juan", apellido_paterno: "Pérez", rol_nombre: "OPERADOR", colonia_nombre: "Centro", activo: true },
-  { correo: "ana.ruiz@correo.com", nombre: "Ana", apellido_paterno: "Ruiz", rol_nombre: "CIUDADANO", colonia_nombre: "San Felipe del Agua", activo: false },
-  { correo: "admin@ecoruta.mx", nombre: "Carlos", apellido_paterno: "Méndez", rol_nombre: "ADMINISTRADOR", colonia_nombre: null, activo: true },
-];
+const NOMBRE_ROL: Record<RolBD, string> = {
+  ADMINISTRADOR: "Administrador",
+  CONDUCTOR: "Operador",
+  CIUDADANO: "Ciudadano",
+};
+
+function mensajeDeError(error: unknown): string {
+  const estado = (error as { status?: number } | null)?.status;
+  if (estado === 403) return "No tienes permisos para administrar usuarios.";
+  if (estado === 404) return "El usuario ya no existe.";
+  if (estado === 409) return "No puedes desactivar tu propia cuenta.";
+  return "No se pudo conectar con el servidor. Intenta de nuevo.";
+}
 
 export default function Usuarios() {
-  const [usuarios, setUsuarios] = useState<Usuario[]>(USUARIOS_PRUEBA);
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [filtroRol, setFiltroRol] = useState("TODOS");
+  const [filtroEstado, setFiltroEstado] = useState("TODOS");
+  const [cargando, setCargando] = useState(true);
+  const [procesando, setProcesando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [usuarioADesactivar, setUsuarioADesactivar] = useState<Usuario | null>(null);
 
-  const usuariosFiltrados =
-    filtroRol === "TODOS" ? usuarios : usuarios.filter((u) => u.rol_nombre === filtroRol);
+  const cargarUsuarios = useCallback(async () => {
+    setCargando(true);
+    setError(null);
+    try {
+      const rol = filtroRol === "TODOS" ? undefined : filtroRol;
+      const datos = (await obtenerUsuarios(rol)) as Usuario[];
+      setUsuarios(datos);
+    } catch (e) {
+      setUsuarios([]);
+      setError(mensajeDeError(e));
+    } finally {
+      setCargando(false);
+    }
+  }, [filtroRol]);
+
+  useEffect(() => {
+    cargarUsuarios();
+  }, [cargarUsuarios]);
+
+  const usuariosFiltrados = usuarios.filter((u) => {
+    if (filtroEstado === "ACTIVOS") return u.activo;
+    if (filtroEstado === "INACTIVOS") return !u.activo;
+    return true;
+  });
+
+  const marcarActivo = (correo: string, activo: boolean) => {
+    setUsuarios((lista) =>
+      lista.map((u) => (u.correo === correo ? { ...u, activo } : u)),
+    );
+  };
+
+  const activar = async (usuario: Usuario) => {
+    setProcesando(true);
+    setError(null);
+    try {
+      await activarUsuario(usuario.correo);
+      marcarActivo(usuario.correo, true);
+    } catch (e) {
+      setError(mensajeDeError(e));
+    } finally {
+      setProcesando(false);
+    }
+  };
+
+  const confirmarDesactivacion = async () => {
+    if (!usuarioADesactivar) return;
+    const { correo } = usuarioADesactivar;
+    setProcesando(true);
+    setError(null);
+    try {
+      await desactivarUsuario(correo);
+      marcarActivo(correo, false);
+    } catch (e) {
+      setError(mensajeDeError(e));
+    } finally {
+      setProcesando(false);
+      setUsuarioADesactivar(null);
+    }
+  };
 
   const columnas: Columna<Usuario>[] = [
     {
       clave: "nombre",
       titulo: "Nombre",
       ordenable: true,
-      valor: (u) => `${u.nombre} ${u.apellido_paterno}`,
+      valor: (u) => `${u.nombre} ${u.apellidoPaterno}`,
     },
     { clave: "correo", titulo: "Correo", ordenable: true },
-    { clave: "rol_nombre", titulo: "Rol", ordenable: true },
-    { clave: "colonia_nombre", titulo: "Colonia", ordenable: true },
+    {
+      clave: "rol",
+      titulo: "Rol",
+      ordenable: true,
+      valor: (u) => NOMBRE_ROL[u.rol] ?? u.rol,
+    },
+    { clave: "coloniaNombre", titulo: "Colonia", ordenable: true },
     {
       clave: "activo",
       titulo: "Estado",
@@ -51,16 +134,6 @@ export default function Usuarios() {
     },
   ];
 
-  const confirmarDesactivacion = () => {
-    if (!usuarioADesactivar) return;
-    setUsuarios((lista) =>
-      lista.map((u) =>
-        u.correo === usuarioADesactivar.correo ? { ...u, activo: false } : u,
-      ),
-    );
-    setUsuarioADesactivar(null);
-  };
-
   return (
     <div>
       <header className={styles.encabezado}>
@@ -68,30 +141,62 @@ export default function Usuarios() {
         <p>Consulta y administra las cuentas registradas</p>
       </header>
 
+      {error && (
+        <div className={styles.error} role="alert">
+          <span>{error}</span>
+          <button className={styles.botonDesactivar} onClick={cargarUsuarios}>
+            Reintentar
+          </button>
+        </div>
+      )}
+
       <TablaDatos
         datos={usuariosFiltrados}
         columnas={columnas}
         obtenerClave={(u) => u.correo}
+        cargando={cargando}
         placeholderBusqueda="Buscar por nombre, correo o colonia..."
+        mensajeVacio="No hay usuarios con estos filtros"
         filtros={
-          <select
-            className={styles.selector}
-            value={filtroRol}
-            onChange={(evento) => setFiltroRol(evento.target.value)}
-          >
-            <option value="TODOS">Todos los roles</option>
-            <option value="ADMINISTRADOR">Administrador</option>
-            <option value="OPERADOR">Operador</option>
-            <option value="CIUDADANO">Ciudadano</option>
-          </select>
+          <>
+            <select
+              className={styles.selector}
+              value={filtroRol}
+              onChange={(evento) => setFiltroRol(evento.target.value)}
+            >
+              <option value="TODOS">Todos los roles</option>
+              <option value="ADMINISTRADOR">Administrador</option>
+              <option value="CONDUCTOR">Operador</option>
+              <option value="CIUDADANO">Ciudadano</option>
+            </select>
+            <select
+              className={styles.selector}
+              value={filtroEstado}
+              onChange={(evento) => setFiltroEstado(evento.target.value)}
+            >
+              <option value="TODOS">Todos los estados</option>
+              <option value="ACTIVOS">Activos</option>
+              <option value="INACTIVOS">Inactivos</option>
+            </select>
+          </>
         }
         acciones={(u) =>
           u.activo ? (
-            <button className={styles.botonDesactivar} onClick={() => setUsuarioADesactivar(u)}>
+            <button
+              className={styles.botonDesactivar}
+              disabled={procesando}
+              onClick={() => setUsuarioADesactivar(u)}
+            >
               Desactivar
             </button>
           ) : (
-            <span className={styles.sinAccion}>—</span>
+            <button
+              className={styles.botonActivar}
+              disabled={procesando}
+              onClick={() => activar(u)}
+            >
+              Activar
+            </button>
           )
         }
       />
