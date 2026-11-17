@@ -3,7 +3,6 @@ import type { ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router";
 
 import Footer from "../../components/Inicio/Footer/Footer";
-import Mapa from "../../components/Inicio/Mapa/Mapa";
 import logoEcorruta from "../../assets/img/LogoEcorrutaBlanco.png";
 import { useAuth } from "../../context/AuthContext";
 import {
@@ -13,9 +12,18 @@ import {
   obtenerDatosPrivados,
   obtenerEjecucionesOperador,
   obtenerIncidenciasEjecucion,
+  obtenerUbicacionesEjecucion,
   registrarIncidencia,
 } from "../../services/api";
+import MapaRecorrido from "./MapaRecorrido";
+import type { Coordenada } from "./MapaRecorrido";
 import styles from "./PanelOperador.module.css";
+
+interface UbicacionRegistrada {
+  guardada: boolean;
+  latitud: number;
+  longitud: number;
+}
 
 interface Ejecucion {
   folioEjecucion: number;
@@ -139,6 +147,13 @@ function PanelOperador() {
   const [ahora, setAhora] = useState(() => Date.now());
   const posicionActual = useRef<Posicion | null>(null);
 
+  // Recorrido real (ubicaciones guardadas) que se dibuja en el mapa
+  const [folioSeleccionado, setFolioSeleccionado] = useState<number | null>(null);
+  const [cargaRecorrido, setCargaRecorrido] = useState<{
+    folio: number;
+    puntos: Coordenada[];
+  } | null>(null);
+
   // Incidencias
   const [recargaIncidencias, setRecargaIncidencias] = useState(0);
   const [cargaIncidencias, setCargaIncidencias] = useState<{
@@ -164,6 +179,17 @@ function PanelOperador() {
   const incidencias =
     cargaIncidencias && cargaIncidencias.folio === folioEnCurso
       ? cargaIncidencias.datos
+      : [];
+
+  // El mapa muestra el recorrido en curso o, si no hay, el que el operador eligió revisar
+  const ejecucionMapa =
+    enCurso ??
+    ejecuciones.find((e) => e.folioEjecucion === folioSeleccionado) ??
+    null;
+  const folioMapa = ejecucionMapa?.folioEjecucion ?? null;
+  const puntosRecorrido =
+    cargaRecorrido && cargaRecorrido.folio === folioMapa
+      ? cargaRecorrido.puntos
       : [];
 
   const sinGeolocalizacion = !("geolocation" in navigator);
@@ -236,6 +262,30 @@ function PanelOperador() {
     };
   }, [folioEnCurso, recargaIncidencias]);
 
+  // Recorrido real guardado en la BD para el mapa
+  useEffect(() => {
+    if (folioMapa === null) return;
+
+    let activo = true;
+
+    obtenerUbicacionesEjecucion(folioMapa)
+      .then((datos: UbicacionRegistrada[]) => {
+        if (activo) {
+          setCargaRecorrido({
+            folio: folioMapa,
+            puntos: datos.map((u) => [Number(u.longitud), Number(u.latitud)]),
+          });
+        }
+      })
+      .catch(() => {
+        if (activo) setCargaRecorrido({ folio: folioMapa, puntos: [] });
+      });
+
+    return () => {
+      activo = false;
+    };
+  }, [folioMapa]);
+
   // ------------------------------------------------------------
   // GPS: seguimiento mientras hay un recorrido en curso (CU-07)
   // ------------------------------------------------------------
@@ -273,8 +323,27 @@ function PanelOperador() {
       if (!posicion) return;
 
       try {
-        await enviarUbicacion(folioEnCurso, posicion.latitud, posicion.longitud);
+        const respuesta: UbicacionRegistrada = await enviarUbicacion(
+          folioEnCurso,
+          posicion.latitud,
+          posicion.longitud,
+        );
         setUltimoEnvio(new Date());
+
+        // Si el servidor la guardó, se agrega a la línea del recorrido real
+        if (respuesta?.guardada) {
+          setCargaRecorrido((anterior) =>
+            anterior && anterior.folio === folioEnCurso
+              ? {
+                  folio: folioEnCurso,
+                  puntos: [
+                    ...anterior.puntos,
+                    [posicion.longitud, posicion.latitud],
+                  ],
+                }
+              : { folio: folioEnCurso, puntos: [[posicion.longitud, posicion.latitud]] },
+          );
+        }
       } catch (err) {
         const fallo = err as Error & { status?: number };
 
@@ -568,9 +637,50 @@ function PanelOperador() {
                   Finalizar recorrido
                 </button>
               )}
+
+              {ejecucion.estado === "FINALIZADA" && !enCurso && (
+                <button
+                  type="button"
+                  className={styles.botonSecundario}
+                  onClick={() =>
+                    setFolioSeleccionado((actual) =>
+                      actual === ejecucion.folioEjecucion
+                        ? null
+                        : ejecucion.folioEjecucion,
+                    )
+                  }
+                  aria-pressed={folioSeleccionado === ejecucion.folioEjecucion}
+                >
+                  {folioSeleccionado === ejecucion.folioEjecucion
+                    ? "Ocultar recorrido"
+                    : "Ver recorrido en el mapa"}
+                </button>
+              )}
             </article>
           ))}
         </section>
+
+        {!enCurso && ejecucionMapa && (
+          <section className={styles.panel}>
+            <h2>Recorrido realizado · {ejecucionMapa.rutaNombre}</h2>
+
+            <p className={styles.resumenRecorrido}>
+              {puntosRecorrido.length === 0
+                ? "Este recorrido no tiene posiciones guardadas."
+                : `${puntosRecorrido.length} posiciones reales registradas entre las ${formatearHora(
+                    ejecucionMapa.fechaInicio,
+                  )} y las ${formatearHora(ejecucionMapa.fechaFin)}.`}
+            </p>
+
+            <MapaRecorrido
+              key={ejecucionMapa.folioEjecucion}
+              geometria={ejecucionMapa.geometria}
+              recorrido={puntosRecorrido}
+              posicionActual={puntosRecorrido.at(-1) ?? null}
+              seguir={false}
+            />
+          </section>
+        )}
 
         {enCurso && (
           <>
@@ -610,11 +720,23 @@ function PanelOperador() {
                 </small>
               </div>
 
-              {enCurso.geometria && (
-                <div className={styles.mapa}>
-                  <Mapa geometria={enCurso.geometria} />
-                </div>
-              )}
+              <MapaRecorrido
+                key={enCurso.folioEjecucion}
+                geometria={enCurso.geometria}
+                recorrido={puntosRecorrido}
+                posicionActual={
+                  ultimaPosicion
+                    ? [ultimaPosicion.longitud, ultimaPosicion.latitud]
+                    : (puntosRecorrido.at(-1) ?? null)
+                }
+                seguir
+              />
+
+              <p className={styles.resumenRecorrido}>
+                {puntosRecorrido.length === 0
+                  ? "Aún no hay posiciones guardadas de este recorrido."
+                  : `${puntosRecorrido.length} posiciones reales guardadas en este recorrido.`}
+              </p>
             </section>
 
             <section className={styles.panel}>
