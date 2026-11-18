@@ -94,3 +94,19 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+
+.selectorRol {
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  background: white;
+  cursor: pointer;
+}
+
+.selectorRol:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
