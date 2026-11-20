@@ -1,8 +1,18 @@
 import { useEffect, useState, useMemo } from "react";
 import styles from "./RutasAdmin.module.css";
 import ModalConfirmacion from "../../components/Admin/ModalConfirmacion";
+import FormularioRuta from "../../components/Admin/FormularioRuta";
+import type {
+  ColoniaOpcion,
+  DatosRuta,
+  ValoresRuta,
+} from "../../components/Admin/FormularioRuta";
 import {
   obtenerRutas,
+  obtenerRuta,
+  obtenerColonias,
+  crearRuta,
+  editarRuta,
   desactivarRuta,
   activarRuta,
   eliminarRuta,
@@ -17,7 +27,19 @@ interface Ruta {
   totalColonias: number;
 }
 
+interface DetalleRuta {
+  nombre: string;
+  descripcion: string | null;
+  distanciaKm: number | null;
+  colonias: ColoniaOpcion[];
+}
+
 type FiltroEstado = "todas" | "activas" | "inactivas";
+
+type FormularioAbierto = {
+  modo: "crear" | "editar";
+  inicial: ValoresRuta;
+} | null;
 
 function mensajeDeError(error: unknown): string {
   const estado = (error as { status?: number } | null)?.status;
@@ -25,6 +47,24 @@ function mensajeDeError(error: unknown): string {
   if (estado === 404) return "La ruta ya no existe.";
   if (estado === 409) {
     return "No se puede eliminar: la ruta tiene horarios o recorridos registrados. Desactívala en su lugar.";
+  }
+  return "No se pudo conectar con el servidor. Intenta de nuevo.";
+}
+
+function mensajeDeErrorFormulario(
+  error: unknown,
+  modo: "crear" | "editar",
+): string {
+  const estado = (error as { status?: number } | null)?.status;
+  if (estado === 400) {
+    return "Algún dato no es válido. Revisa el nombre y las colonias.";
+  }
+  if (estado === 403) return "No tienes permisos para administrar rutas.";
+  if (estado === 404) return "La ruta ya no existe.";
+  if (estado === 409) {
+    return modo === "crear"
+      ? "Ya existe una ruta con ese nombre."
+      : "No se pudo guardar por un conflicto con otra ruta.";
   }
   return "No se pudo conectar con el servidor. Intenta de nuevo.";
 }
@@ -37,6 +77,12 @@ export default function RutasAdmin() {
   const [filtroEstado, setFiltroEstado] = useState<FiltroEstado>("todas");
   const [procesando, setProcesando] = useState<string | null>(null);
   const [rutaAEliminar, setRutaAEliminar] = useState<Ruta | null>(null);
+
+  const [colonias, setColonias] = useState<ColoniaOpcion[]>([]);
+  const [formulario, setFormulario] = useState<FormularioAbierto>(null);
+  const [abriendo, setAbriendo] = useState<string | null>(null);
+  const [guardando, setGuardando] = useState(false);
+  const [errorForm, setErrorForm] = useState("");
 
   const cargarRutas = () => {
     setCargando(true);
@@ -63,6 +109,80 @@ export default function RutasAdmin() {
       );
     });
   }, [rutas, busqueda, filtroEstado]);
+
+  const cargarColonias = async (): Promise<ColoniaOpcion[]> => {
+    if (colonias.length > 0) return colonias;
+    const lista = (await obtenerColonias()) as ColoniaOpcion[];
+    setColonias(lista);
+    return lista;
+  };
+
+  const abrirCrear = async () => {
+    setError("");
+    setAbriendo("nueva");
+    try {
+      await cargarColonias();
+      setErrorForm("");
+      setFormulario({
+        modo: "crear",
+        inicial: { nombre: "", descripcion: "", distanciaKm: "", colonias: [] },
+      });
+    } catch (err) {
+      setError(mensajeDeError(err));
+    } finally {
+      setAbriendo(null);
+    }
+  };
+
+  const abrirEditar = async (ruta: Ruta) => {
+    setError("");
+    setAbriendo(ruta.nombre);
+    try {
+      const [detalle] = await Promise.all([
+        obtenerRuta(ruta.nombre) as Promise<DetalleRuta>,
+        cargarColonias(),
+      ]);
+      setErrorForm("");
+      setFormulario({
+        modo: "editar",
+        inicial: {
+          nombre: detalle.nombre,
+          descripcion: detalle.descripcion ?? "",
+          distanciaKm:
+            detalle.distanciaKm != null ? String(detalle.distanciaKm) : "",
+          colonias: detalle.colonias,
+        },
+      });
+    } catch (err) {
+      setError(mensajeDeError(err));
+    } finally {
+      setAbriendo(null);
+    }
+  };
+
+  const guardar = async (datos: DatosRuta) => {
+    if (!formulario) return;
+    setGuardando(true);
+    setErrorForm("");
+    try {
+      const cuerpo = {
+        descripcion: datos.descripcion || null,
+        distanciaKm: datos.distanciaKm,
+        colonias: datos.colonias,
+      };
+      if (formulario.modo === "crear") {
+        await crearRuta({ nombre: datos.nombre, ...cuerpo });
+      } else {
+        await editarRuta(formulario.inicial.nombre, cuerpo);
+      }
+      setFormulario(null);
+      cargarRutas();
+    } catch (err) {
+      setErrorForm(mensajeDeErrorFormulario(err, formulario.modo));
+    } finally {
+      setGuardando(false);
+    }
+  };
 
   const cambiarEstado = async (ruta: Ruta) => {
     setProcesando(ruta.nombre);
@@ -113,8 +233,13 @@ export default function RutasAdmin() {
           <h1>Rutas</h1>
           <p>Gestiona las rutas de recolección</p>
         </div>
-        <button type="button" className={styles.botonPrimario} disabled>
-          + Nueva ruta
+        <button
+          type="button"
+          className={styles.botonPrimario}
+          onClick={abrirCrear}
+          disabled={abriendo !== null}
+        >
+          {abriendo === "nueva" ? "Abriendo..." : "+ Nueva ruta"}
         </button>
       </header>
 
@@ -189,10 +314,12 @@ export default function RutasAdmin() {
                     <button
                       type="button"
                       className={styles.botonSecundario}
-                      disabled
-                      title="Disponible próximamente"
+                      onClick={() => abrirEditar(ruta)}
+                      disabled={
+                        procesando === ruta.nombre || abriendo !== null
+                      }
                     >
-                      Editar
+                      {abriendo === ruta.nombre ? "Abriendo..." : "Editar"}
                     </button>
                     <button
                       type="button"
@@ -216,6 +343,18 @@ export default function RutasAdmin() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {formulario && (
+        <FormularioRuta
+          modo={formulario.modo}
+          inicial={formulario.inicial}
+          colonias={colonias}
+          guardando={guardando}
+          errorServidor={errorForm}
+          onGuardar={guardar}
+          onCancelar={() => setFormulario(null)}
+        />
       )}
 
       <ModalConfirmacion
