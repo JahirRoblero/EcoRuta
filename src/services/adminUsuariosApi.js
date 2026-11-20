@@ -42,3 +42,16 @@ export function desactivarUsuario(correo) {
     method: "PATCH",
   });
 }
+
+
+export function cambiarRolUsuario(correo, rol) {
+  if (USAR_MOCKS) {
+    const usuario = MOCK_USUARIOS.find((u) => u.correo === correo);
+    if (usuario) usuario.rol = rol;
+    return simularRed(null, 300);
+  }
+  return apiFetch(`/api/admin/usuarios/${encodeURIComponent(correo)}/rol`, {
+    method: "PATCH",
+    body: JSON.stringify({ rol }),
+  });
+}
