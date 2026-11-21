@@ -13,6 +13,10 @@ interface Unidad {
   fechaHora: string | null;
   minutosSinActualizar: number | null;
   desactualizada: boolean;
+  /** Puntos [longitud, latitud] por donde ya pasó la unidad. */
+  recorrido: [number, number][];
+  /** Incidencias abiertas del recorrido (solo tipo y hora). */
+  avisos: { tipo: string; fechaHora: string | null }[];
 }
 
 interface Horario {
@@ -31,8 +35,8 @@ interface Seguimiento {
   horarios: Horario[];
 }
 
-/** Cada cuánto se vuelve a consultar la posición del camión. */
-const INTERVALO_ACTUALIZACION_MS = 30_000;
+/** Cada cuánto se vuelve a consultar la posición (el operador la envía cada 15 s). */
+const INTERVALO_ACTUALIZACION_MS = 15_000;
 
 const DIAS = [
   "",
@@ -129,7 +133,7 @@ function SeguimientoCamion() {
         {seguimiento && (
           <p>
             Colonia {seguimiento.colonia} ({seguimiento.codigoPostal}) · se
-            actualiza cada 30 segundos
+            actualiza cada 15 segundos
           </p>
         )}
       </header>
@@ -164,6 +168,21 @@ function SeguimientoCamion() {
                     <p>La unidad todavía no reporta su ubicación.</p>
                   )}
 
+                  {(unidad.avisos ?? []).length > 0 && (
+                    <div className={styles.avisoIncidencia} role="alert">
+                      <strong>Posible retraso en tu ruta</strong>
+                      <ul>
+                        {unidad.avisos.map((aviso, indice) => (
+                          <li key={`${aviso.tipo}-${aviso.fechaHora ?? indice}`}>
+                            {aviso.tipo}
+                            {aviso.fechaHora &&
+                              ` (reportado a las ${formatearHora(aviso.fechaHora)})`}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
                   {tienePosicion && unidad.desactualizada && (
                     <p className={styles.noActualizada} role="status">
                       Ubicación no actualizada: el camión lleva más de{" "}
@@ -175,14 +194,14 @@ function SeguimientoCamion() {
 
                 <MapaRecorrido
                   geometria={unidad.geometria}
-                  recorrido={[]}
+                  recorrido={unidad.recorrido ?? []}
                   posicionActual={
                     tienePosicion
                       ? [Number(unidad.longitud), Number(unidad.latitud)]
                       : null
                   }
                   seguir={false}
-                  mostrarRecorrido={false}
+                  mostrarRecorrido={(unidad.recorrido ?? []).length > 1}
                 />
               </article>
             );

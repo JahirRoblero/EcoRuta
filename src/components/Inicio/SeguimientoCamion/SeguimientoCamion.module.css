@@ -123,3 +123,18 @@
     font-size: 0.85rem;
   }
 }
+
+/* Aviso de incidencia en la ruta (HU-24 CA2) */
+.avisoIncidencia {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border-left: 5px solid #e09b00;
+  background-color: #fff4d6;
+  color: #6b4d00;
+  font-size: 0.9rem;
+}
+
+.avisoIncidencia ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+}
