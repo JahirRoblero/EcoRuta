@@ -352,7 +352,15 @@ function PanelOperador() {
         hora: new Date(posicion.timestamp),
       };
 
-      await enviarUbicacion(folioEnCurso, actual.latitud, actual.longitud);
+      try {
+        await enviarUbicacion(folioEnCurso, actual.latitud, actual.longitud);
+      } catch (err) {
+        const mensajeServidor = err instanceof Error ? err.message : "Error de conexión con Spring Boot.";
+        setGps({ folio: folioEnCurso, estado: "activo",
+          mensaje: "El teléfono sí encontró tu ubicación, pero no pudo guardarse en el servidor." });
+        setError(`GPS obtenido, pero falló el envío: ${mensajeServidor}`);
+        return;
+      }
 
       posicionActual.current = actual;
       setUltimaPosicion(actual);
