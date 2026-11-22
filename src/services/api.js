@@ -206,30 +206,9 @@ export function obtenerAsignaciones(fecha) {
   return apiFetch(`/api/admin/ejecuciones?fecha=${encodeURIComponent(fecha)}`);
 }
 
-export function listarAsignacionesFijas() {
-  return apiFetch("/api/admin/asignaciones");
-}
-
-export function crearAsignacionFija(datos) {
-  return apiFetch("/api/admin/asignaciones", {
+export function asignarRecorrido(datos) {
+  return apiFetch("/api/admin/ejecuciones", {
     method: "POST",
     body: JSON.stringify(datos),
-  });
-}
-
-export function desactivarAsignacion(id) {
-  return apiFetch(`/api/admin/asignaciones/${id}/desactivar`, {
-    method: "PATCH",
-  });
-}
-
-// El operador solo recibe las rutas configuradas para su cuenta.
-export function obtenerAsignacionesOperador() {
-  return apiFetch("/api/operador/asignaciones");
-}
-
-export function iniciarAsignacion(id) {
-  return apiFetch(`/api/operador/asignaciones/${id}/iniciar`, {
-    method: "POST",
   });
 }
