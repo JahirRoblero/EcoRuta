@@ -12,12 +12,24 @@ import {
   obtenerDatosPrivados,
   obtenerEjecucionesOperador,
   obtenerIncidenciasEjecucion,
+  obtenerOpcionesInicio,
+  iniciarRutaElegida,
   obtenerUbicacionesEjecucion,
   registrarIncidencia,
 } from "../../services/api";
 import MapaRecorrido from "./MapaRecorrido";
 import type { Coordenada } from "./MapaRecorrido";
 import styles from "./PanelOperador.module.css";
+
+interface OpcionesInicio {
+  rutas: { nombre: string; descripcion: string | null; colonias: string[] }[];
+  vehiculos: {
+    placa: string;
+    numeroEconomico: string;
+    marca: string | null;
+    modelo: string | null;
+  }[];
+}
 
 interface UbicacionRegistrada {
   guardada: boolean;
@@ -146,6 +158,7 @@ function PanelOperador() {
   const [ultimoEnvio, setUltimoEnvio] = useState<Date | null>(null);
   const [ahora, setAhora] = useState(() => Date.now());
   const posicionActual = useRef<Posicion | null>(null);
+  const [pantallaEncendida, setPantallaEncendida] = useState(false);
 
   // Recorrido real (ubicaciones guardadas) que se dibuja en el mapa
   const [folioSeleccionado, setFolioSeleccionado] = useState<number | null>(null);
@@ -155,6 +168,12 @@ function PanelOperador() {
   } | null>(null);
 
   // Incidencias
+  // Salir a ruta: el operador elige ruta y unidad
+  const [opciones, setOpciones] = useState<OpcionesInicio | null>(null);
+  const [errorOpciones, setErrorOpciones] = useState("");
+  const [rutaElegida, setRutaElegida] = useState("");
+  const [vehiculoElegido, setVehiculoElegido] = useState("");
+
   const [recargaIncidencias, setRecargaIncidencias] = useState(0);
   const [cargaIncidencias, setCargaIncidencias] = useState<{
     folio: number;
@@ -286,6 +305,29 @@ function PanelOperador() {
     };
   }, [folioMapa]);
 
+  // Rutas activas y unidades disponibles para "Salir a ruta"
+  useEffect(() => {
+    if (!esHoy || folioEnCurso !== null) return;
+
+    let activo = true;
+
+    obtenerOpcionesInicio()
+      .then((datos: OpcionesInicio) => {
+        if (!activo) return;
+        setOpciones(datos);
+        setErrorOpciones("");
+      })
+      .catch(() => {
+        if (activo) {
+          setErrorOpciones("No se pudieron cargar las rutas y unidades disponibles.");
+        }
+      });
+
+    return () => {
+      activo = false;
+    };
+  }, [esHoy, folioEnCurso, recarga]);
+
   // ------------------------------------------------------------
   // GPS: seguimiento mientras hay un recorrido en curso (CU-07)
   // ------------------------------------------------------------
@@ -372,6 +414,62 @@ function PanelOperador() {
     };
   }, [folioEnCurso, sinGeolocalizacion, recargar]);
 
+  // Mantener la pantalla encendida durante el recorrido: si el celular se bloquea,
+  // el navegador deja de enviar la ubicación y el ciudadano deja de ver la unidad
+  useEffect(() => {
+    if (folioEnCurso === null || !("wakeLock" in navigator)) return;
+
+    let bloqueo: WakeLockSentinel | null = null;
+    let activo = true;
+
+    const solicitar = () => {
+      navigator.wakeLock
+        .request("screen")
+        .then((sentinela) => {
+          if (!activo) {
+            sentinela.release();
+            return;
+          }
+          bloqueo = sentinela;
+          setPantallaEncendida(true);
+          sentinela.addEventListener("release", () => {
+            if (activo) setPantallaEncendida(false);
+          });
+        })
+        .catch(() => {
+          if (activo) setPantallaEncendida(false);
+        });
+    };
+
+    // El navegador suelta el bloqueo al cambiar de pestaña; se vuelve a pedir al regresar
+    const alCambiarVisibilidad = () => {
+      if (document.visibilityState === "visible") solicitar();
+    };
+
+    solicitar();
+    document.addEventListener("visibilitychange", alCambiarVisibilidad);
+
+    return () => {
+      activo = false;
+      document.removeEventListener("visibilitychange", alCambiarVisibilidad);
+      bloqueo?.release();
+    };
+  }, [folioEnCurso]);
+
+  // Avisar si el operador intenta cerrar o recargar la página con el recorrido en curso
+  useEffect(() => {
+    if (folioEnCurso === null) return;
+
+    const alSalir = (evento: BeforeUnloadEvent) => {
+      evento.preventDefault();
+      // Requerido por algunos navegadores para mostrar la confirmación
+      evento.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", alSalir);
+    return () => window.removeEventListener("beforeunload", alSalir);
+  }, [folioEnCurso]);
+
   // Reloj para detectar posición desactualizada
   useEffect(() => {
     if (folioEnCurso === null) return;
@@ -387,6 +485,35 @@ function PanelOperador() {
   // ------------------------------------------------------------
   // Acciones del recorrido (CU-06)
   // ------------------------------------------------------------
+
+  const manejarSalirARuta = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!rutaElegida || !vehiculoElegido) return;
+
+    setError("");
+    setMensaje("");
+    setProcesando(true);
+
+    try {
+      await iniciarRutaElegida(rutaElegida, vehiculoElegido);
+      setMensaje(
+        "Recorrido iniciado. Los vecinos ya pueden ver tu unidad en el mapa; mantén esta página abierta.",
+      );
+      setRutaElegida("");
+      setVehiculoElegido("");
+      recargar();
+    } catch (err) {
+      setError(
+        mensajeDeError(
+          err,
+          "No se pudo iniciar el recorrido. Verifica que la unidad siga disponible.",
+        ),
+      );
+      recargar();
+    } finally {
+      setProcesando(false);
+    }
+  };
 
   const manejarIniciar = async (folio: number) => {
     setError("");
@@ -563,11 +690,88 @@ function PanelOperador() {
 
         {cargando && <p>Cargando recorridos...</p>}
 
-        {!cargando && !errorCarga && ejecuciones.length === 0 && (
+        {!cargando && !errorCarga && esHoy && !enCurso && (
+          <section className={styles.panel} aria-labelledby="titulo-salir">
+            <h2 id="titulo-salir">Salir a ruta</h2>
+            <p className={styles.resumenRecorrido}>
+              Elige la ruta y la unidad con la que vas a salir. Al iniciar, los
+              vecinos de las colonias de esa ruta verán el camión en su mapa.
+            </p>
+
+            {errorOpciones && (
+              <div className={styles.error} role="alert">
+                {errorOpciones}
+              </div>
+            )}
+
+            {opciones && (
+              <form className={styles.formulario} onSubmit={manejarSalirARuta}>
+                <label>
+                  Ruta *
+                  <select
+                    value={rutaElegida}
+                    onChange={(e) => setRutaElegida(e.target.value)}
+                    disabled={procesando || opciones.rutas.length === 0}
+                    required
+                  >
+                    <option value="">
+                      {opciones.rutas.length === 0
+                        ? "No hay rutas activas"
+                        : "Selecciona una ruta"}
+                    </option>
+                    {opciones.rutas.map((ruta) => (
+                      <option key={ruta.nombre} value={ruta.nombre}>
+                        {ruta.nombre}
+                        {ruta.colonias.length > 0 &&
+                          ` — ${ruta.colonias.join(", ")}`}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label>
+                  Unidad *
+                  <select
+                    value={vehiculoElegido}
+                    onChange={(e) => setVehiculoElegido(e.target.value)}
+                    disabled={procesando || opciones.vehiculos.length === 0}
+                    required
+                  >
+                    <option value="">
+                      {opciones.vehiculos.length === 0
+                        ? "No hay unidades disponibles"
+                        : "Selecciona una unidad"}
+                    </option>
+                    {opciones.vehiculos.map((vehiculo) => (
+                      <option key={vehiculo.placa} value={vehiculo.placa}>
+                        {vehiculo.numeroEconomico} · {vehiculo.placa}
+                        {vehiculo.marca && ` (${vehiculo.marca})`}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <button
+                  type="submit"
+                  className={styles.botonPrimario}
+                  disabled={procesando || !rutaElegida || !vehiculoElegido}
+                >
+                  {procesando ? "Iniciando..." : "Iniciar recorrido"}
+                </button>
+              </form>
+            )}
+          </section>
+        )}
+
+        {!cargando && !errorCarga && ejecuciones.length > 0 && (
+          <h2 className={styles.subtituloLista}>
+            {esHoy ? "Recorridos de hoy" : "Recorridos de esta fecha"}
+          </h2>
+        )}
+
+        {!cargando && !errorCarga && !esHoy && ejecuciones.length === 0 && (
           <div className={styles.vacio}>
-            {esHoy
-              ? "No tienes ningún recorrido asignado para hoy."
-              : "No tienes recorridos asignados en esta fecha."}
+            No tienes recorridos en esta fecha.
           </div>
         )}
 
@@ -716,7 +920,9 @@ function PanelOperador() {
                 <p>Último envío al servidor: {formatearHora(ultimoEnvio)}</p>
 
                 <small>
-                  Mantén esta página abierta y la pantalla encendida durante el recorrido.
+                  {pantallaEncendida
+                    ? "La pantalla se mantendrá encendida mientras el recorrido esté en curso. No cierres esta página."
+                    : "Mantén esta página abierta y la pantalla encendida durante el recorrido."}
                 </small>
               </div>
 

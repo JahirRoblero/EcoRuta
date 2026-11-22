@@ -443,3 +443,10 @@
   font-size: 0.9rem;
   color: #555;
 }
+
+/* Salir a ruta */
+.subtituloLista {
+  margin: 8px 0 0;
+  font-size: 1.1rem;
+  color: #333;
+}

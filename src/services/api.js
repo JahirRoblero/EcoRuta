@@ -196,3 +196,15 @@ export function obtenerUbicacionesEjecucion(folio) {
 export function obtenerSeguimientoMiColonia() {
   return apiFetch("/api/seguimiento/mi-colonia");
 }
+
+// El operador elige ruta y unidad y el recorrido inicia de inmediato
+export function obtenerOpcionesInicio() {
+  return apiFetch("/api/operador/opciones-inicio");
+}
+
+export function iniciarRutaElegida(rutaNombre, placaVehiculo) {
+  return apiFetch("/api/operador/recorridos", {
+    method: "POST",
+    body: JSON.stringify({ rutaNombre, placaVehiculo }),
+  });
+}
