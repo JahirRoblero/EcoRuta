@@ -1,0 +1,19 @@
+.pagina { min-height: 100vh; background: #f6f6f6; font-family: "Montserrat", sans-serif; }
+.barra { background: #9d2449; color: white; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.barra h1 { font-size: 1.3rem; }
+.barra button { color: white; background: transparent; border: 1px solid white; border-radius: 5px; padding: 8px 12px; cursor: pointer; }
+.contenido { max-width: 960px; margin: auto; padding: 30px 16px; display: flex; flex-direction: column; gap: 18px; }
+.contenido h2 { color: #9d2449; }
+.panel { background: white; padding: 24px; box-shadow: 0 2px 8px #0001; border-radius: 9px; display: flex; flex-direction: column; gap: 15px; }
+.panel label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
+.panel input, .panel select { padding: 10px; border: 1px solid #bbb; border-radius: 5px; width: 100%; font: inherit; }
+.primario { background: #9d2449; color: white; border: 0; border-radius: 6px; padding: 12px 16px; font: inherit; cursor: pointer; }
+.primario:disabled { opacity: .6; cursor: not-allowed; }
+.error { background: #fdecea; color: #8a1c1c; padding: 12px; border-radius: 5px; }
+.exito { background: #e6f4ea; color: #1e5e2f; padding: 12px; border-radius: 5px; }
+.encabezado { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.encabezado button { padding: 8px 12px; cursor: pointer; }
+.tabla { overflow-x: auto; }
+.tabla table { border-collapse: collapse; width: 100%; }
+.tabla th, .tabla td { text-align: left; padding: 10px; border-bottom: 1px solid #ddd; }
+@media (max-width: 600px) { .panel { padding: 16px; } }

@@ -197,14 +197,18 @@ export function obtenerSeguimientoMiColonia() {
   return apiFetch("/api/seguimiento/mi-colonia");
 }
 
-// El operador elige ruta y unidad y el recorrido inicia de inmediato
-export function obtenerOpcionesInicio() {
-  return apiFetch("/api/operador/opciones-inicio");
+// Solo el administrador asigna conductor, ruta y unidad.
+export function obtenerOpcionesAsignacion() {
+  return apiFetch("/api/admin/opciones-asignacion");
 }
 
-export function iniciarRutaElegida(rutaNombre, placaVehiculo) {
-  return apiFetch("/api/operador/recorridos", {
+export function obtenerAsignaciones(fecha) {
+  return apiFetch(`/api/admin/ejecuciones?fecha=${encodeURIComponent(fecha)}`);
+}
+
+export function asignarRecorrido(datos) {
+  return apiFetch("/api/admin/ejecuciones", {
     method: "POST",
-    body: JSON.stringify({ rutaNombre, placaVehiculo }),
+    body: JSON.stringify(datos),
   });
 }

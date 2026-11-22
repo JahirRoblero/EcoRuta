@@ -12,24 +12,12 @@ import {
   obtenerDatosPrivados,
   obtenerEjecucionesOperador,
   obtenerIncidenciasEjecucion,
-  obtenerOpcionesInicio,
-  iniciarRutaElegida,
   obtenerUbicacionesEjecucion,
   registrarIncidencia,
 } from "../../services/api";
 import MapaRecorrido from "./MapaRecorrido";
 import type { Coordenada } from "./MapaRecorrido";
 import styles from "./PanelOperador.module.css";
-
-interface OpcionesInicio {
-  rutas: { nombre: string; descripcion: string | null; colonias: string[] }[];
-  vehiculos: {
-    placa: string;
-    numeroEconomico: string;
-    marca: string | null;
-    modelo: string | null;
-  }[];
-}
 
 interface UbicacionRegistrada {
   guardada: boolean;
@@ -66,9 +54,6 @@ interface Posicion {
 }
 
 type EstadoGps = "inactivo" | "buscando" | "activo" | "error";
-
-/** Cada cuánto se envía la posición al servidor (HU-13 CA1: intervalo configurable). */
-const INTERVALO_ENVIO_MS = 15_000;
 
 /** Después de este tiempo sin posición nueva, se marca como desactualizada (HU-13 CA2). */
 const MINUTOS_DESACTUALIZADA = 2;
@@ -158,7 +143,7 @@ function PanelOperador() {
   const [ultimoEnvio, setUltimoEnvio] = useState<Date | null>(null);
   const [ahora, setAhora] = useState(() => Date.now());
   const posicionActual = useRef<Posicion | null>(null);
-  const [pantallaEncendida, setPantallaEncendida] = useState(false);
+
 
   // Recorrido real (ubicaciones guardadas) que se dibuja en el mapa
   const [folioSeleccionado, setFolioSeleccionado] = useState<number | null>(null);
@@ -168,12 +153,6 @@ function PanelOperador() {
   } | null>(null);
 
   // Incidencias
-  // Salir a ruta: el operador elige ruta y unidad
-  const [opciones, setOpciones] = useState<OpcionesInicio | null>(null);
-  const [errorOpciones, setErrorOpciones] = useState("");
-  const [rutaElegida, setRutaElegida] = useState("");
-  const [vehiculoElegido, setVehiculoElegido] = useState("");
-
   const [recargaIncidencias, setRecargaIncidencias] = useState(0);
   const [cargaIncidencias, setCargaIncidencias] = useState<{
     folio: number;
@@ -215,10 +194,10 @@ function PanelOperador() {
   const gpsActual = gps && gps.folio === folioEnCurso ? gps : null;
   const estadoGps: EstadoGps = sinGeolocalizacion
     ? "error"
-    : (gpsActual?.estado ?? "buscando");
+    : (gpsActual?.estado ?? "inactivo");
   const mensajeGps = sinGeolocalizacion
     ? "Este dispositivo no permite obtener la ubicación."
-    : (gpsActual?.mensaje ?? "Obteniendo ubicación...");
+    : (gpsActual?.mensaje ?? "Pulsa Actualizar ubicación para usar el GPS.");
 
   const recargar = useCallback(() => setRecarga((r) => r + 1), []);
 
@@ -305,156 +284,70 @@ function PanelOperador() {
     };
   }, [folioMapa]);
 
-  // Rutas activas y unidades disponibles para "Salir a ruta"
-  useEffect(() => {
-    if (!esHoy || folioEnCurso !== null) return;
+  // La ubicación se consulta y se envía únicamente al pulsar el botón.
+  const actualizarUbicacion = async () => {
+    if (folioEnCurso === null || procesando) return;
 
-    let activo = true;
+    if (!navigator.geolocation) {
+      setGps({ folio: folioEnCurso, estado: "error",
+        mensaje: "Este dispositivo no admite geolocalización." });
+      return;
+    }
 
-    obtenerOpcionesInicio()
-      .then((datos: OpcionesInicio) => {
-        if (!activo) return;
-        setOpciones(datos);
-        setErrorOpciones("");
-      })
-      .catch(() => {
-        if (activo) {
-          setErrorOpciones("No se pudieron cargar las rutas y unidades disponibles.");
-        }
+    setProcesando(true);
+    setGps({ folio: folioEnCurso, estado: "buscando",
+      mensaje: "Solicitando ubicación actual al teléfono..." });
+    setError("");
+    setMensaje("");
+
+    try {
+      const posicion = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 20_000,
+        });
       });
 
-    return () => {
-      activo = false;
-    };
-  }, [esHoy, folioEnCurso, recarga]);
+      const actual: Posicion = {
+        latitud: Number(posicion.coords.latitude.toFixed(6)),
+        longitud: Number(posicion.coords.longitude.toFixed(6)),
+        hora: new Date(posicion.timestamp),
+      };
 
-  // ------------------------------------------------------------
-  // GPS: seguimiento mientras hay un recorrido en curso (CU-07)
-  // ------------------------------------------------------------
+      // Se guarda en Neon solamente después de recibir una posición GPS válida.
+      const respuesta: UbicacionRegistrada = await enviarUbicacion(
+        folioEnCurso, actual.latitud, actual.longitud,
+      );
 
-  useEffect(() => {
-    if (folioEnCurso === null || sinGeolocalizacion) return;
+      posicionActual.current = actual;
+      setUltimaPosicion(actual);
+      setUltimoEnvio(new Date());
+      setGps({ folio: folioEnCurso, estado: "activo",
+        mensaje: respuesta.guardada ? "Ubicación enviada correctamente." : "Ubicación recibida." });
 
-    const idSeguimiento = navigator.geolocation.watchPosition(
-      (pos) => {
-        const posicion = {
-          latitud: Number(pos.coords.latitude.toFixed(6)),
-          longitud: Number(pos.coords.longitude.toFixed(6)),
-          hora: new Date(),
-        };
-
-        posicionActual.current = posicion;
-        setUltimaPosicion(posicion);
-        setGps({ folio: folioEnCurso, estado: "activo", mensaje: "" });
-      },
-      (err) => {
-        setGps({
-          folio: folioEnCurso,
-          estado: "error",
-          mensaje:
-            err.code === err.PERMISSION_DENIED
-              ? "No diste permiso de ubicación. Actívalo en tu navegador para registrar el recorrido."
-              : "No hay señal GPS. Se seguirá intentando.",
-        });
-      },
-      { enableHighAccuracy: true, maximumAge: 5_000, timeout: 20_000 },
-    );
-
-    const enviar = async () => {
-      const posicion = posicionActual.current;
-      if (!posicion) return;
-
-      try {
-        const respuesta: UbicacionRegistrada = await enviarUbicacion(
-          folioEnCurso,
-          posicion.latitud,
-          posicion.longitud,
-        );
-        setUltimoEnvio(new Date());
-
-        // Si el servidor la guardó, se agrega a la línea del recorrido real
-        if (respuesta?.guardada) {
-          setCargaRecorrido((anterior) =>
-            anterior && anterior.folio === folioEnCurso
-              ? {
-                  folio: folioEnCurso,
-                  puntos: [
-                    ...anterior.puntos,
-                    [posicion.longitud, posicion.latitud],
-                  ],
-                }
-              : { folio: folioEnCurso, puntos: [[posicion.longitud, posicion.latitud]] },
-          );
-        }
-      } catch (err) {
-        const fallo = err as Error & { status?: number };
-
-        if (fallo.status === 409) {
-          // El recorrido ya no está en curso: recargar estado
-          recargar();
-        } else {
-          setGps((anterior) => ({
-            folio: folioEnCurso,
-            estado: anterior?.estado ?? "buscando",
-            mensaje: "No se pudo enviar la ubicación. Se reintentará.",
-          }));
-        }
-      }
-    };
-
-    // Primer envío poco después de obtener posición, luego cada intervalo
-    const primerEnvio = window.setTimeout(enviar, 3_000);
-    const intervalo = window.setInterval(enviar, INTERVALO_ENVIO_MS);
-
-    return () => {
-      navigator.geolocation.clearWatch(idSeguimiento);
-      window.clearTimeout(primerEnvio);
-      window.clearInterval(intervalo);
-      posicionActual.current = null;
-    };
-  }, [folioEnCurso, sinGeolocalizacion, recargar]);
-
-  // Mantener la pantalla encendida durante el recorrido: si el celular se bloquea,
-  // el navegador deja de enviar la ubicación y el ciudadano deja de ver la unidad
-  useEffect(() => {
-    if (folioEnCurso === null || !("wakeLock" in navigator)) return;
-
-    let bloqueo: WakeLockSentinel | null = null;
-    let activo = true;
-
-    const solicitar = () => {
-      navigator.wakeLock
-        .request("screen")
-        .then((sentinela) => {
-          if (!activo) {
-            sentinela.release();
-            return;
-          }
-          bloqueo = sentinela;
-          setPantallaEncendida(true);
-          sentinela.addEventListener("release", () => {
-            if (activo) setPantallaEncendida(false);
-          });
-        })
-        .catch(() => {
-          if (activo) setPantallaEncendida(false);
-        });
-    };
-
-    // El navegador suelta el bloqueo al cambiar de pestaña; se vuelve a pedir al regresar
-    const alCambiarVisibilidad = () => {
-      if (document.visibilityState === "visible") solicitar();
-    };
-
-    solicitar();
-    document.addEventListener("visibilitychange", alCambiarVisibilidad);
-
-    return () => {
-      activo = false;
-      document.removeEventListener("visibilitychange", alCambiarVisibilidad);
-      bloqueo?.release();
-    };
-  }, [folioEnCurso]);
+      // Sincronizar la línea con las posiciones realmente persistidas.
+      const ubicaciones: UbicacionRegistrada[] = await obtenerUbicacionesEjecucion(folioEnCurso);
+      setCargaRecorrido({
+        folio: folioEnCurso,
+        puntos: ubicaciones.map((u) => [Number(u.longitud), Number(u.latitud)]),
+      });
+      setMensaje("Ubicación actualizada. Los ciudadanos verán el cambio en su próxima consulta.");
+    } catch (err) {
+      const gpsError = err as GeolocationPositionError;
+      const mensaje = typeof gpsError.code === "number"
+        ? gpsError.code === 1
+          ? "Permite el acceso a tu ubicación en el navegador."
+          : gpsError.code === 3
+            ? "El GPS tardó demasiado. Inténtalo de nuevo."
+            : "No fue posible obtener tu ubicación."
+        : err instanceof Error ? err.message : "No fue posible registrar tu ubicación.";
+      setGps({ folio: folioEnCurso, estado: "error", mensaje });
+      setError(mensaje);
+    } finally {
+      setProcesando(false);
+    }
+  };
 
   // Avisar si el operador intenta cerrar o recargar la página con el recorrido en curso
   useEffect(() => {
@@ -485,35 +378,6 @@ function PanelOperador() {
   // ------------------------------------------------------------
   // Acciones del recorrido (CU-06)
   // ------------------------------------------------------------
-
-  const manejarSalirARuta = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!rutaElegida || !vehiculoElegido) return;
-
-    setError("");
-    setMensaje("");
-    setProcesando(true);
-
-    try {
-      await iniciarRutaElegida(rutaElegida, vehiculoElegido);
-      setMensaje(
-        "Recorrido iniciado. Los vecinos ya pueden ver tu unidad en el mapa; mantén esta página abierta.",
-      );
-      setRutaElegida("");
-      setVehiculoElegido("");
-      recargar();
-    } catch (err) {
-      setError(
-        mensajeDeError(
-          err,
-          "No se pudo iniciar el recorrido. Verifica que la unidad siga disponible.",
-        ),
-      );
-      recargar();
-    } finally {
-      setProcesando(false);
-    }
-  };
 
   const manejarIniciar = async (folio: number) => {
     setError("");
@@ -690,76 +554,14 @@ function PanelOperador() {
 
         {cargando && <p>Cargando recorridos...</p>}
 
-        {!cargando && !errorCarga && esHoy && !enCurso && (
-          <section className={styles.panel} aria-labelledby="titulo-salir">
-            <h2 id="titulo-salir">Salir a ruta</h2>
-            <p className={styles.resumenRecorrido}>
-              Elige la ruta y la unidad con la que vas a salir. Al iniciar, los
-              vecinos de las colonias de esa ruta verán el camión en su mapa.
-            </p>
-
-            {errorOpciones && (
-              <div className={styles.error} role="alert">
-                {errorOpciones}
-              </div>
-            )}
-
-            {opciones && (
-              <form className={styles.formulario} onSubmit={manejarSalirARuta}>
-                <label>
-                  Ruta *
-                  <select
-                    value={rutaElegida}
-                    onChange={(e) => setRutaElegida(e.target.value)}
-                    disabled={procesando || opciones.rutas.length === 0}
-                    required
-                  >
-                    <option value="">
-                      {opciones.rutas.length === 0
-                        ? "No hay rutas activas"
-                        : "Selecciona una ruta"}
-                    </option>
-                    {opciones.rutas.map((ruta) => (
-                      <option key={ruta.nombre} value={ruta.nombre}>
-                        {ruta.nombre}
-                        {ruta.colonias.length > 0 &&
-                          ` — ${ruta.colonias.join(", ")}`}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label>
-                  Unidad *
-                  <select
-                    value={vehiculoElegido}
-                    onChange={(e) => setVehiculoElegido(e.target.value)}
-                    disabled={procesando || opciones.vehiculos.length === 0}
-                    required
-                  >
-                    <option value="">
-                      {opciones.vehiculos.length === 0
-                        ? "No hay unidades disponibles"
-                        : "Selecciona una unidad"}
-                    </option>
-                    {opciones.vehiculos.map((vehiculo) => (
-                      <option key={vehiculo.placa} value={vehiculo.placa}>
-                        {vehiculo.numeroEconomico} · {vehiculo.placa}
-                        {vehiculo.marca && ` (${vehiculo.marca})`}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <button
-                  type="submit"
-                  className={styles.botonPrimario}
-                  disabled={procesando || !rutaElegida || !vehiculoElegido}
-                >
-                  {procesando ? "Iniciando..." : "Iniciar recorrido"}
-                </button>
-              </form>
-            )}
+        {!cargando && !errorCarga && esHoy && !enCurso &&
+          ejecuciones.every((e) => e.estado !== "PENDIENTE") && (
+          <section className={styles.panel}>
+            <h2>Sin recorrido pendiente</h2>
+            <p>El administrador debe asignarte una ruta y una unidad.
+              Cuando lo haga, aparecerán aquí y podrás iniciar el recorrido.</p>
+            <button className={styles.botonSecundario} type="button"
+              onClick={recargar}>Consultar asignaciones</button>
           </section>
         )}
 
@@ -905,6 +707,7 @@ function PanelOperador() {
                   {estadoGps === "activo" && !posicionDesactualizada && "GPS activo"}
                   {estadoGps === "activo" && posicionDesactualizada && "Ubicación desactualizada"}
                   {estadoGps === "buscando" && "Buscando señal GPS..."}
+                  {estadoGps === "inactivo" && "GPS listo para actualización manual"}
                   {estadoGps === "error" && "GPS no disponible"}
                 </strong>
 
@@ -919,11 +722,13 @@ function PanelOperador() {
 
                 <p>Último envío al servidor: {formatearHora(ultimoEnvio)}</p>
 
-                <small>
-                  {pantallaEncendida
-                    ? "La pantalla se mantendrá encendida mientras el recorrido esté en curso. No cierres esta página."
-                    : "Mantén esta página abierta y la pantalla encendida durante el recorrido."}
-                </small>
+                <small>Tu ubicación solo se envía cuando presionas el botón. Activa
+                  la ubicación del teléfono y mantén el navegador en HTTPS.</small>
+                <button type="button" className={styles.botonPrimario}
+                  disabled={procesando || sinGeolocalizacion}
+                  onClick={actualizarUbicacion}>
+                  {procesando ? "Actualizando..." : "Actualizar ubicación"}
+                </button>
               </div>
 
               <MapaRecorrido
@@ -1012,8 +817,8 @@ function PanelOperador() {
 
                 <small>
                   {ultimaPosicion
-                    ? "Se adjuntará tu ubicación actual."
-                    : "No hay ubicación disponible; la incidencia se registrará sin coordenadas."}
+                    ? "Se adjuntará la última ubicación enviada."
+                    : "No hay ubicación enviada; la incidencia se registrará sin coordenadas."}
                 </small>
 
                 <button

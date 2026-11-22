@@ -35,7 +35,7 @@ interface Seguimiento {
   horarios: Horario[];
 }
 
-/** Cada cuánto se vuelve a consultar la posición (el operador la envía cada 15 s). */
+/** El ciudadano consulta nuevas posiciones cada 15 s; el operador solo envía al pulsar el botón. */
 const INTERVALO_ACTUALIZACION_MS = 15_000;
 
 const DIAS = [

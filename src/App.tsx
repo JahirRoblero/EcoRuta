@@ -13,6 +13,7 @@ import PuntosBasura from "./pages/PuntosBasura/PuntosBasura";
 import Registro from "./pages/Registro/Registro";
 import MiPerfil from "./pages/MiPerfil/MiPerfil";
 import PanelOperador from "./pages/Operador/PanelOperador";
+import Asignaciones from "./pages/Admin/Asignaciones";
 
 function App() {
   return (
@@ -31,6 +32,11 @@ function App() {
 
       <Route element={<RutaProtegida rolRequerido="operador" />}>
         <Route path="/operador" element={<PanelOperador />} />
+      </Route>
+
+      <Route element={<RutaProtegida rolRequerido="admin" />}>
+        <Route path="/admin" element={<Asignaciones />} />
+        <Route path="/admin/asignaciones" element={<Asignaciones />} />
       </Route>
 
       <Route path="*" element={<NoEncontrado />} />
