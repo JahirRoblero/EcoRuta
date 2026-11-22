@@ -11,6 +11,8 @@ import {
   iniciarRecorrido,
   obtenerDatosPrivados,
   obtenerEjecucionesOperador,
+  obtenerAsignacionesOperador,
+  iniciarAsignacion,
   obtenerIncidenciasEjecucion,
   obtenerUbicacionesEjecucion,
   registrarIncidencia,
@@ -18,6 +20,26 @@ import {
 import MapaRecorrido from "./MapaRecorrido";
 import type { Coordenada } from "./MapaRecorrido";
 import styles from "./PanelOperador.module.css";
+import { obtenerUbicacionTelefono } from "../../utils/gps";
+
+interface AsignacionFija {
+  idAsignacion: number;
+  rutaNombre: string;
+  rutaDescripcion: string | null;
+  numeroEconomico: string;
+  placaVehiculo: string;
+  diasSemana: number[];
+  iniciadaHoy: boolean;
+}
+
+const DIAS_TRABAJO = ["", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+
+function diaActualOaxaca(): number {
+  const texto = new Date().toLocaleDateString("en-US", {
+    weekday: "short", timeZone: "America/Mexico_City",
+  });
+  return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].indexOf(texto) + 1;
+}
 
 interface UbicacionRegistrada {
   guardada: boolean;
@@ -116,6 +138,9 @@ function PanelOperador() {
 
   const [nombre, setNombre] = useState("");
   const [fecha, setFecha] = useState(hoyEnOaxaca);
+  const [asignaciones, setAsignaciones] = useState<AsignacionFija[]>([]);
+  const [cargandoAsignaciones, setCargandoAsignaciones] = useState(true);
+  const [errorAsignaciones, setErrorAsignaciones] = useState("");
 
   // Resultado de la última carga; "clave" identifica qué fecha/recarga lo produjo
   const [recarga, setRecarga] = useState(0);
@@ -190,13 +215,13 @@ function PanelOperador() {
       ? cargaRecorrido.puntos
       : [];
 
-  const sinGeolocalizacion = !("geolocation" in navigator);
+  const sinGeolocalizacion = !window.isSecureContext || !("geolocation" in navigator);
   const gpsActual = gps && gps.folio === folioEnCurso ? gps : null;
   const estadoGps: EstadoGps = sinGeolocalizacion
     ? "error"
     : (gpsActual?.estado ?? "inactivo");
   const mensajeGps = sinGeolocalizacion
-    ? "Este dispositivo no permite obtener la ubicación."
+    ? "La ubicación requiere HTTPS y un navegador con permisos de geolocalización."
     : (gpsActual?.mensaje ?? "Pulsa Actualizar ubicación para usar el GPS.");
 
   const recargar = useCallback(() => setRecarga((r) => r + 1), []);
@@ -242,6 +267,31 @@ function PanelOperador() {
     };
   }, [fecha, recarga]);
 
+  // La asignación es permanente: se consulta sin importar la fecha elegida
+  // para revisar el historial.
+  useEffect(() => {
+    let activo = true;
+    setCargandoAsignaciones(true);
+    obtenerAsignacionesOperador()
+      .then((datos: AsignacionFija[]) => {
+        if (activo) {
+          setAsignaciones(datos);
+          setErrorAsignaciones("");
+        }
+      })
+      .catch((err: unknown) => {
+        if (activo) {
+          setErrorAsignaciones(
+            err instanceof Error ? err.message : "No se pudo cargar tu ruta asignada.",
+          );
+        }
+      })
+      .finally(() => {
+        if (activo) setCargandoAsignaciones(false);
+      });
+    return () => { activo = false; };
+  }, [recarga]);
+
   useEffect(() => {
     if (folioEnCurso === null) return;
 
@@ -284,15 +334,9 @@ function PanelOperador() {
     };
   }, [folioMapa]);
 
-  // La ubicación se consulta y se envía únicamente al pulsar el botón.
+  // El usuario decide cuándo consultar y publicar UNA ubicación.
   const actualizarUbicacion = async () => {
     if (folioEnCurso === null || procesando) return;
-
-    if (!navigator.geolocation) {
-      setGps({ folio: folioEnCurso, estado: "error",
-        mensaje: "Este dispositivo no admite geolocalización." });
-      return;
-    }
 
     setProcesando(true);
     setGps({ folio: folioEnCurso, estado: "buscando",
@@ -301,47 +345,35 @@ function PanelOperador() {
     setMensaje("");
 
     try {
-      const posicion = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          maximumAge: 0,
-          timeout: 20_000,
-        });
-      });
-
+      const posicion = await obtenerUbicacionTelefono();
       const actual: Posicion = {
         latitud: Number(posicion.coords.latitude.toFixed(6)),
         longitud: Number(posicion.coords.longitude.toFixed(6)),
         hora: new Date(posicion.timestamp),
       };
 
-      // Se guarda en Neon solamente después de recibir una posición GPS válida.
-      const respuesta: UbicacionRegistrada = await enviarUbicacion(
-        folioEnCurso, actual.latitud, actual.longitud,
-      );
+      await enviarUbicacion(folioEnCurso, actual.latitud, actual.longitud);
 
       posicionActual.current = actual;
       setUltimaPosicion(actual);
       setUltimoEnvio(new Date());
       setGps({ folio: folioEnCurso, estado: "activo",
-        mensaje: respuesta.guardada ? "Ubicación enviada correctamente." : "Ubicación recibida." });
+        mensaje: `Ubicación enviada. Precisión aproximada: ${Math.round(posicion.coords.accuracy)} metros.` });
+      setMensaje("Ubicación guardada. Los vecinos verán el cambio en su siguiente consulta.");
 
-      // Sincronizar la línea con las posiciones realmente persistidas.
-      const ubicaciones: UbicacionRegistrada[] = await obtenerUbicacionesEjecucion(folioEnCurso);
-      setCargaRecorrido({
-        folio: folioEnCurso,
-        puntos: ubicaciones.map((u) => [Number(u.longitud), Number(u.latitud)]),
-      });
-      setMensaje("Ubicación actualizada. Los ciudadanos verán el cambio en su próxima consulta.");
+      // Si esta consulta falla, no reportar que falló el GPS o el guardado.
+      try {
+        const ubicaciones: UbicacionRegistrada[] =
+          await obtenerUbicacionesEjecucion(folioEnCurso);
+        setCargaRecorrido({
+          folio: folioEnCurso,
+          puntos: ubicaciones.map((u) => [Number(u.longitud), Number(u.latitud)]),
+        });
+      } catch {
+        setMensaje("Ubicación enviada correctamente; recarga la página para ver la línea.");
+      }
     } catch (err) {
-      const gpsError = err as GeolocationPositionError;
-      const mensaje = typeof gpsError.code === "number"
-        ? gpsError.code === 1
-          ? "Permite el acceso a tu ubicación en el navegador."
-          : gpsError.code === 3
-            ? "El GPS tardó demasiado. Inténtalo de nuevo."
-            : "No fue posible obtener tu ubicación."
-        : err instanceof Error ? err.message : "No fue posible registrar tu ubicación.";
+      const mensaje = err instanceof Error ? err.message : "No se pudo actualizar la ubicación.";
       setGps({ folio: folioEnCurso, estado: "error", mensaje });
       setError(mensaje);
     } finally {
@@ -378,6 +410,22 @@ function PanelOperador() {
   // ------------------------------------------------------------
   // Acciones del recorrido (CU-06)
   // ------------------------------------------------------------
+
+  const manejarIniciarAsignacion = async (idAsignacion: number) => {
+    setError("");
+    setMensaje("");
+    setProcesando(true);
+    try {
+      await iniciarAsignacion(idAsignacion);
+      setMensaje("Recorrido iniciado. Los vecinos de la ruta ya pueden verlo; pulsa Actualizar ubicación cuando desees registrar tu posición.");
+      recargar();
+    } catch (err) {
+      setError(mensajeDeError(err, err instanceof Error ? err.message : "No se pudo iniciar el recorrido de hoy."));
+      recargar();
+    } finally {
+      setProcesando(false);
+    }
+  };
 
   const manejarIniciar = async (folio: number) => {
     setError("");
@@ -554,14 +602,42 @@ function PanelOperador() {
 
         {cargando && <p>Cargando recorridos...</p>}
 
-        {!cargando && !errorCarga && esHoy && !enCurso &&
-          ejecuciones.every((e) => e.estado !== "PENDIENTE") && (
+        {esHoy && (
           <section className={styles.panel}>
-            <h2>Sin recorrido pendiente</h2>
-            <p>El administrador debe asignarte una ruta y una unidad.
-              Cuando lo haga, aparecerán aquí y podrás iniciar el recorrido.</p>
-            <button className={styles.botonSecundario} type="button"
-              onClick={recargar}>Consultar asignaciones</button>
+            <h2>Mi ruta y unidad asignadas</h2>
+            <p className={styles.resumenRecorrido}>
+              Estas asignaciones siguen vigentes hasta que el administrador las cambie.
+              Cada día de trabajo tú decides cuándo iniciar y finalizar el recorrido.
+            </p>
+            {cargandoAsignaciones && <p>Cargando tu asignación...</p>}
+            {errorAsignaciones && <p className={styles.error} role="alert">{errorAsignaciones}</p>}
+            {!cargandoAsignaciones && !errorAsignaciones && asignaciones.length === 0 && (
+              <p>El administrador todavía no te ha asignado una ruta permanente.</p>
+            )}
+            {asignaciones.map((a) => {
+              const hoyCorresponde = a.diasSemana.includes(diaActualOaxaca());
+              const disponible = hoyCorresponde && !a.iniciadaHoy && !enCurso;
+              return (
+                <article key={a.idAsignacion} className={styles.tarjeta}>
+                  <h3>{a.rutaNombre}</h3>
+                  {a.rutaDescripcion && <p>{a.rutaDescripcion}</p>}
+                  <p><strong>Unidad:</strong> {a.numeroEconomico} · {a.placaVehiculo}</p>
+                  <p><strong>Días:</strong> {a.diasSemana.map((d) => DIAS_TRABAJO[d]).join(", ")}</p>
+                  {!hoyCorresponde && <p>Hoy no está programado este recorrido.</p>}
+                  {a.iniciadaHoy && <p>El recorrido de hoy ya fue iniciado.</p>}
+                  <button type="button" className={styles.botonPrimario}
+                    onClick={() => void manejarIniciarAsignacion(a.idAsignacion)}
+                    disabled={procesando || !disponible}
+                    title={!hoyCorresponde ? "Hoy no es día de trabajo para esta ruta" : undefined}>
+                    {enCurso ? "Ya tienes un recorrido activo" : "Iniciar recorrido de hoy"}
+                  </button>
+                </article>
+              );
+            })}
+            <button type="button" className={styles.botonSecundario}
+              onClick={recargar} disabled={procesando}>
+              Consultar asignación
+            </button>
           </section>
         )}
 
@@ -722,10 +798,11 @@ function PanelOperador() {
 
                 <p>Último envío al servidor: {formatearHora(ultimoEnvio)}</p>
 
-                <small>Tu ubicación solo se envía cuando presionas el botón. Activa
-                  la ubicación del teléfono y mantén el navegador en HTTPS.</small>
+                <small>El GPS del sistema y el permiso de ubicación de este sitio son
+                  independientes. Abre Ecorruta directamente por HTTPS; si el permiso está
+                  bloqueado, habilítalo en la configuración del sitio del navegador.</small>
                 <button type="button" className={styles.botonPrimario}
-                  disabled={procesando || sinGeolocalizacion}
+                  disabled={procesando}
                   onClick={actualizarUbicacion}>
                   {procesando ? "Actualizando..." : "Actualizar ubicación"}
                 </button>
