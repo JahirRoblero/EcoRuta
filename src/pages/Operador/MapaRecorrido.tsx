@@ -4,19 +4,13 @@ import "mapbox-gl/dist/mapbox-gl.css";
 
 import styles from "./PanelOperador.module.css";
 
-/** [longitud, latitud], el orden que usa Mapbox. */
 export type Coordenada = [number, number];
 
 interface MapaRecorridoProps {
-  /** Trazo planeado de la ruta (GeoJSON LineString guardado en la tabla ruta). */
   geometria: string | null;
-  /** Posiciones reales registradas en ubicacion_unidad, en orden. */
   recorrido: Coordenada[];
-  /** Posición actual del dispositivo del operador (o la última registrada). */
   posicionActual: Coordenada | null;
-  /** Centrar el mapa en la unidad cada vez que se mueve. */
   seguir: boolean;
-  /** Mostrar "Recorrido real (GPS)" en la leyenda (no aplica en la vista ciudadana). */
   mostrarRecorrido?: boolean;
 }
 
@@ -70,10 +64,6 @@ function crearMarcadorUnidad(): HTMLElement {
   return elemento;
 }
 
-/**
- * Mapa del panel del operador: muestra la ruta planeada (línea gris punteada),
- * el recorrido real registrado por GPS (línea guinda) y la unidad (camión).
- */
 function MapaRecorrido({
   geometria,
   recorrido,
@@ -97,8 +87,12 @@ function MapaRecorrido({
     const instancia = mapa.current;
     if (!instancia || !listo.current) return;
 
-    const { planeada, recorrido: puntos, posicionActual: actual, seguir: centrar } =
-      datos.current;
+    const {
+      planeada,
+      recorrido: puntos,
+      posicionActual: actual,
+      seguir: centrar,
+    } = datos.current;
 
     (instancia.getSource("ruta-planeada") as mapboxgl.GeoJSONSource).setData(
       linea(planeada),
@@ -109,7 +103,9 @@ function MapaRecorrido({
 
     if (actual) {
       if (!marcador.current) {
-        marcador.current = new mapboxgl.Marker({ element: crearMarcadorUnidad() })
+        marcador.current = new mapboxgl.Marker({
+          element: crearMarcadorUnidad(),
+        })
           .setLngLat(actual)
           .addTo(instancia);
       } else {
@@ -120,7 +116,6 @@ function MapaRecorrido({
       marcador.current = null;
     }
 
-    // La primera vez se encuadra todo lo que hay; después solo se sigue a la unidad
     if (!encuadrado.current) {
       const todos = [...planeada, ...puntos, ...(actual ? [actual] : [])];
 
@@ -134,8 +129,6 @@ function MapaRecorrido({
       instancia.easeTo({ center: actual, duration: 800 });
     }
   };
-
-  // Crear el mapa una sola vez
   useEffect(() => {
     if (!contenedor.current) return;
 
@@ -151,7 +144,10 @@ function MapaRecorrido({
     instancia.addControl(new mapboxgl.NavigationControl(), "top-right");
 
     instancia.on("load", () => {
-      instancia.addSource("ruta-planeada", { type: "geojson", data: linea([]) });
+      instancia.addSource("ruta-planeada", {
+        type: "geojson",
+        data: linea([]),
+      });
       instancia.addLayer({
         id: "ruta-planeada",
         type: "line",
@@ -164,7 +160,10 @@ function MapaRecorrido({
         },
       });
 
-      instancia.addSource("recorrido-real", { type: "geojson", data: linea([]) });
+      instancia.addSource("recorrido-real", {
+        type: "geojson",
+        data: linea([]),
+      });
       instancia.addLayer({
         id: "recorrido-real",
         type: "line",

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import Footer from "../../components/Inicio/Footer/Footer";
 import logoEcorruta from "../../assets/img/LogoEcorrutaBlanco.png";
 import { useAuth } from "../../context/AuthContext";
+
 import {
   enviarUbicacion,
   finalizarRecorrido,
@@ -15,6 +16,7 @@ import {
   obtenerUbicacionesEjecucion,
   registrarIncidencia,
 } from "../../services/api";
+
 import MapaRecorrido from "./MapaRecorrido";
 import type { Coordenada } from "./MapaRecorrido";
 import styles from "./PanelOperador.module.css";
@@ -56,7 +58,6 @@ interface Posicion {
 
 type EstadoGps = "inactivo" | "buscando" | "activo" | "error";
 
-/** Después de este tiempo sin posición nueva, se marca como desactualizada (HU-13 CA2). */
 const MINUTOS_DESACTUALIZADA = 2;
 
 const TIPOS_INCIDENCIA = [
@@ -118,7 +119,6 @@ function PanelOperador() {
   const [nombre, setNombre] = useState("");
   const [fecha, setFecha] = useState(hoyEnOaxaca);
 
-  // Resultado de la última carga; "clave" identifica qué fecha/recarga lo produjo
   const [recarga, setRecarga] = useState(0);
   const [carga, setCarga] = useState<{
     clave: string;
@@ -129,12 +129,10 @@ function PanelOperador() {
   const [mensaje, setMensaje] = useState("");
   const [procesando, setProcesando] = useState(false);
 
-  // Finalizar recorrido
   const [mostrarFinalizar, setMostrarFinalizar] = useState(false);
   const [completado, setCompletado] = useState(true);
   const [observaciones, setObservaciones] = useState("");
 
-  // GPS (el estado se guarda junto al folio al que pertenece)
   const [gps, setGps] = useState<{
     folio: number;
     estado: EstadoGps;
@@ -145,15 +143,14 @@ function PanelOperador() {
   const [ahora, setAhora] = useState(() => Date.now());
   const posicionActual = useRef<Posicion | null>(null);
 
-
-  // Recorrido real (ubicaciones guardadas) que se dibuja en el mapa
-  const [folioSeleccionado, setFolioSeleccionado] = useState<number | null>(null);
+  const [folioSeleccionado, setFolioSeleccionado] = useState<number | null>(
+    null,
+  );
   const [cargaRecorrido, setCargaRecorrido] = useState<{
     folio: number;
     puntos: Coordenada[];
   } | null>(null);
 
-  // Incidencias
   const [recargaIncidencias, setRecargaIncidencias] = useState(0);
   const [cargaIncidencias, setCargaIncidencias] = useState<{
     folio: number;
@@ -180,7 +177,6 @@ function PanelOperador() {
       ? cargaIncidencias.datos
       : [];
 
-  // El mapa muestra el recorrido en curso o, si no hay, el que el operador eligió revisar
   const ejecucionMapa =
     enCurso ??
     ejecuciones.find((e) => e.folioEjecucion === folioSeleccionado) ??
@@ -191,7 +187,8 @@ function PanelOperador() {
       ? cargaRecorrido.puntos
       : [];
 
-  const sinGeolocalizacion = !window.isSecureContext || !("geolocation" in navigator);
+  const sinGeolocalizacion =
+    !window.isSecureContext || !("geolocation" in navigator);
   const gpsActual = gps && gps.folio === folioEnCurso ? gps : null;
   const estadoGps: EstadoGps = sinGeolocalizacion
     ? "error"
@@ -201,10 +198,6 @@ function PanelOperador() {
     : (gpsActual?.mensaje ?? "Pulsa Actualizar ubicación para usar el GPS.");
 
   const recargar = useCallback(() => setRecarga((r) => r + 1), []);
-
-  // ------------------------------------------------------------
-  // Carga de datos
-  // ------------------------------------------------------------
 
   useEffect(() => {
     let activo = true;
@@ -290,8 +283,11 @@ function PanelOperador() {
     if (folioEnCurso === null || procesando) return;
 
     setProcesando(true);
-    setGps({ folio: folioEnCurso, estado: "buscando",
-      mensaje: "Solicitando ubicación actual al teléfono..." });
+    setGps({
+      folio: folioEnCurso,
+      estado: "buscando",
+      mensaje: "Solicitando ubicación actual al teléfono...",
+    });
     setError("");
     setMensaje("");
 
@@ -306,9 +302,16 @@ function PanelOperador() {
       try {
         await enviarUbicacion(folioEnCurso, actual.latitud, actual.longitud);
       } catch (err) {
-        const mensajeServidor = err instanceof Error ? err.message : "Error de conexión con Spring Boot.";
-        setGps({ folio: folioEnCurso, estado: "activo",
-          mensaje: "El teléfono sí obtuvo la ubicación; falló el envío al servidor." });
+        const mensajeServidor =
+          err instanceof Error
+            ? err.message
+            : "Error de conexión con Spring Boot.";
+        setGps({
+          folio: folioEnCurso,
+          estado: "activo",
+          mensaje:
+            "El teléfono sí obtuvo la ubicación; falló el envío al servidor.",
+        });
         setError(`GPS obtenido, pero falló el envío: ${mensajeServidor}`);
         return;
       }
@@ -316,22 +319,33 @@ function PanelOperador() {
       posicionActual.current = actual;
       setUltimaPosicion(actual);
       setUltimoEnvio(new Date());
-      setGps({ folio: folioEnCurso, estado: "activo",
-        mensaje: `Ubicación enviada. Precisión aproximada: ${Math.round(posicion.coords.accuracy)} metros.` });
-      setMensaje("Ubicación guardada. Los vecinos verán el cambio en su siguiente consulta.");
+      setGps({
+        folio: folioEnCurso,
+        estado: "activo",
+        mensaje: `Ubicación enviada. Precisión aproximada: ${Math.round(posicion.coords.accuracy)} metros.`,
+      });
+      setMensaje(
+        "Ubicación guardada. Los vecinos verán el cambio en su siguiente consulta.",
+      );
 
       try {
         const ubicaciones: UbicacionRegistrada[] =
           await obtenerUbicacionesEjecucion(folioEnCurso);
         setCargaRecorrido({
           folio: folioEnCurso,
-          puntos: ubicaciones.map((u) => [Number(u.longitud), Number(u.latitud)]),
+          puntos: ubicaciones.map((u) => [
+            Number(u.longitud),
+            Number(u.latitud),
+          ]),
         });
       } catch {
         setMensaje("Ubicación enviada. Recarga la página para ver la línea.");
       }
     } catch (err) {
-      const mensaje = err instanceof Error ? err.message : "No se pudo actualizar la ubicación.";
+      const mensaje =
+        err instanceof Error
+          ? err.message
+          : "No se pudo actualizar la ubicación.";
       setGps({ folio: folioEnCurso, estado: "error", mensaje });
       setError(mensaje);
     } finally {
@@ -376,7 +390,9 @@ function PanelOperador() {
 
     try {
       await iniciarRecorrido(folio);
-      setMensaje("Recorrido iniciado. Mantén esta página abierta para registrar tu ubicación.");
+      setMensaje(
+        "Recorrido iniciado. Mantén esta página abierta para registrar tu ubicación.",
+      );
       recargar();
     } catch (err) {
       setError(mensajeDeError(err, "No se pudo iniciar el recorrido."));
@@ -473,10 +489,14 @@ function PanelOperador() {
       setTipoIncidencia("");
       setDescripcionIncidencia("");
       setImagenIncidencia(null);
-      setMensajeIncidencia("Incidencia registrada. La Dirección de Aseo Público fue notificada.");
+      setMensajeIncidencia(
+        "Incidencia registrada. La Dirección de Aseo Público fue notificada.",
+      );
       setRecargaIncidencias((r) => r + 1);
     } catch (err) {
-      setErrorIncidencia(mensajeDeError(err, "No se pudo registrar la incidencia."));
+      setErrorIncidencia(
+        mensajeDeError(err, "No se pudo registrar la incidencia."),
+      );
     } finally {
       setEnviandoIncidencia(false);
     }
@@ -544,16 +564,26 @@ function PanelOperador() {
 
         {cargando && <p>Cargando recorridos...</p>}
 
-        {!cargando && !errorCarga && esHoy && !enCurso &&
+        {!cargando &&
+          !errorCarga &&
+          esHoy &&
+          !enCurso &&
           ejecuciones.every((e) => e.estado !== "PENDIENTE") && (
-          <section className={styles.panel}>
-            <h2>Sin recorrido pendiente</h2>
-            <p>El administrador debe asignarte una ruta y una unidad.
-              Cuando lo haga, aparecerán aquí y podrás iniciar el recorrido.</p>
-            <button className={styles.botonSecundario} type="button"
-              onClick={recargar}>Consultar asignaciones</button>
-          </section>
-        )}
+            <section className={styles.panel}>
+              <h2>Sin recorrido pendiente</h2>
+              <p>
+                El administrador debe asignarte una ruta y una unidad. Cuando lo
+                haga, aparecerán aquí y podrás iniciar el recorrido.
+              </p>
+              <button
+                className={styles.botonSecundario}
+                type="button"
+                onClick={recargar}
+              >
+                Consultar asignaciones
+              </button>
+            </section>
+          )}
 
         {!cargando && !errorCarga && ejecuciones.length > 0 && (
           <h2 className={styles.subtituloLista}>
@@ -608,7 +638,9 @@ function PanelOperador() {
               </dl>
 
               {ejecucion.observaciones && (
-                <p className={styles.observaciones}>{ejecucion.observaciones}</p>
+                <p className={styles.observaciones}>
+                  {ejecucion.observaciones}
+                </p>
               )}
 
               {ejecucion.estado === "PENDIENTE" && esHoy && (
@@ -617,7 +649,9 @@ function PanelOperador() {
                   className={styles.botonPrimario}
                   onClick={() => manejarIniciar(ejecucion.folioEjecucion)}
                   disabled={procesando || enCurso !== null}
-                  title={enCurso ? "Ya tienes un recorrido en curso" : undefined}
+                  title={
+                    enCurso ? "Ya tienes un recorrido en curso" : undefined
+                  }
                 >
                   Iniciar recorrido
                 </button>
@@ -694,10 +728,15 @@ function PanelOperador() {
                 role="status"
               >
                 <strong>
-                  {estadoGps === "activo" && !posicionDesactualizada && "GPS activo"}
-                  {estadoGps === "activo" && posicionDesactualizada && "Ubicación desactualizada"}
+                  {estadoGps === "activo" &&
+                    !posicionDesactualizada &&
+                    "GPS activo"}
+                  {estadoGps === "activo" &&
+                    posicionDesactualizada &&
+                    "Ubicación desactualizada"}
                   {estadoGps === "buscando" && "Buscando señal GPS..."}
-                  {estadoGps === "inactivo" && "GPS listo para actualización manual"}
+                  {estadoGps === "inactivo" &&
+                    "GPS listo para actualización manual"}
                   {estadoGps === "error" && "GPS no disponible"}
                 </strong>
 
@@ -705,19 +744,25 @@ function PanelOperador() {
 
                 {ultimaPosicion && (
                   <p>
-                    Última posición: {ultimaPosicion.latitud}, {ultimaPosicion.longitud} (
+                    Última posición: {ultimaPosicion.latitud},{" "}
+                    {ultimaPosicion.longitud} (
                     {formatearHora(ultimaPosicion.hora)})
                   </p>
                 )}
 
                 <p>Último envío al servidor: {formatearHora(ultimoEnvio)}</p>
 
-                <small>Tu ubicación solo se envía cuando presionas el botón. Revisa
-                  que Ecorruta esté abierto por HTTPS y que el navegador tenga permiso
-                  para acceder a la ubicación del teléfono.</small>
-                <button type="button" className={styles.botonPrimario}
+                <small>
+                  Tu ubicación solo se envía cuando presionas el botón. Revisa
+                  que Ecorruta esté abierto por HTTPS y que el navegador tenga
+                  permiso para acceder a la ubicación del teléfono.
+                </small>
+                <button
+                  type="button"
+                  className={styles.botonPrimario}
                   disabled={procesando}
-                  onClick={actualizarUbicacion}>
+                  onClick={actualizarUbicacion}
+                >
                   {procesando ? "Actualizando..." : "Actualizar ubicación"}
                 </button>
               </div>
@@ -800,7 +845,10 @@ function PanelOperador() {
                 {imagenIncidencia && (
                   <p className={styles.archivo}>
                     {imagenIncidencia.name}{" "}
-                    <button type="button" onClick={() => setImagenIncidencia(null)}>
+                    <button
+                      type="button"
+                      onClick={() => setImagenIncidencia(null)}
+                    >
                       Quitar
                     </button>
                   </p>
@@ -828,7 +876,8 @@ function PanelOperador() {
                     {incidencias.map((incidencia) => (
                       <li key={incidencia.idIncidencia}>
                         <strong>{incidencia.titulo}</strong> ·{" "}
-                        {formatearHora(incidencia.fechaHora)} · {incidencia.estado}
+                        {formatearHora(incidencia.fechaHora)} ·{" "}
+                        {incidencia.estado}
                         <p>{incidencia.descripcion}</p>
                       </li>
                     ))}
@@ -841,7 +890,10 @@ function PanelOperador() {
       </main>
 
       {mostrarFinalizar && enCurso && (
-        <div className={styles.fondoModal} onClick={() => setMostrarFinalizar(false)}>
+        <div
+          className={styles.fondoModal}
+          onClick={() => setMostrarFinalizar(false)}
+        >
           <form
             className={styles.modal}
             role="dialog"
@@ -893,7 +945,11 @@ function PanelOperador() {
               >
                 Cancelar
               </button>
-              <button type="submit" className={styles.botonPeligro} disabled={procesando}>
+              <button
+                type="submit"
+                className={styles.botonPeligro}
+                disabled={procesando}
+              >
                 {procesando ? "Finalizando..." : "Confirmar"}
               </button>
             </div>
