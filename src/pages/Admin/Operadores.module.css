@@ -1,0 +1,238 @@
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: "Montserrat", sans-serif;
+}
+
+.encabezado h1 {
+  margin: 0;
+  color: #9d2449;
+}
+
+.encabezado p {
+  margin: 4px 0 0;
+  color: #666;
+}
+
+.seccion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.seccion h2 {
+  margin: 0;
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.15rem;
+  color: #333;
+}
+
+.selector {
+  padding: 9px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: inherit;
+}
+
+.botonPrincipal,
+.botonSecundario {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.botonPrincipal {
+  background-color: #9d2449;
+  border: 1px solid #9d2449;
+  color: white;
+}
+
+.botonPrincipal:hover {
+  background-color: #7e1d3a;
+}
+
+.botonSecundario {
+  background: white;
+  border: 1px solid #9d2449;
+  color: #9d2449;
+}
+
+.botonSecundario:hover {
+  background-color: #f6e8ec;
+}
+
+.botonPrincipal:disabled,
+.botonSecundario:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.etiqueta {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.estadoDisponible {
+  background-color: #e6f4ea;
+  color: #1e7a3c;
+}
+
+.estadoEnRuta {
+  background-color: #e6eef6;
+  color: #2f5d8a;
+}
+
+.estadoMantenimiento {
+  background-color: #fff4e0;
+  color: #9a6200;
+}
+
+.estadoFuera {
+  background-color: #f1f1f1;
+  color: #777;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid #f1b5b5;
+  border-radius: 6px;
+  background-color: #fdecec;
+  color: #9b1c1c;
+}
+
+.aviso {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid #b7dfc3;
+  border-radius: 6px;
+  background-color: #e6f4ea;
+  color: #1e5c33;
+}
+
+.botonCerrarAviso {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* ===== Modal del formulario de alta ===== */
+
+.fondo {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: white;
+  border-radius: 10px;
+  border-top: 4px solid #b38e5d;
+  padding: 24px 28px;
+  width: min(520px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-family: "Montserrat", sans-serif;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.modal h2 {
+  margin: 0;
+  color: #9d2449;
+}
+
+.ayuda {
+  margin: 0;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.campo > span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.campo input {
+  padding: 9px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.campo input[aria-invalid="true"] {
+  border-color: #c0392b;
+}
+
+.contrasena {
+  display: flex;
+  gap: 8px;
+}
+
+.contrasena input {
+  flex: 1;
+}
+
+.errorCampo {
+  color: #b42318;
+  font-size: 0.8rem;
+}
+
+.pista {
+  color: #777;
+  font-size: 0.8rem;
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 4px;
+}
