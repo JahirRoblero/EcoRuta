@@ -12,7 +12,7 @@ import { obtenerReportesRecientes } from "../services/api";
 import stylesInicio from "./Inicio.module.css";
 import { obtenerMiRuta } from "../services/api";
 import { obtenerUrlImagen } from "../services/api";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, use } from "react";
 
 interface Reporte {
   idReporte: number;
@@ -43,6 +43,8 @@ function Inicio() {
   const [cargandoRuta, setCargandoRuta] = useState(true);
   const [errorRuta, setErrorRuta] = useState("");
 
+  const [estaEnRecorrido, setEstaEnRecorrido] = useState(false);
+
   const carruselRef = useRef<HTMLDivElement | null>(null);
 
   const desplazarReportes = (direccion: number) => {
@@ -65,7 +67,6 @@ function Inicio() {
         if (activo) setErrorReportes(error.message);
       })
       .finally(() => {
-        // Antes solo se apagaba en el caso exitoso y con error se quedaba en "Cargando..."
         if (activo) setCargandoReportes(false);
       });
 
@@ -123,12 +124,14 @@ function Inicio() {
 
           {errorRuta && <p role="alert">{errorRuta}</p>}
 
-          {!cargandoRuta && !errorRuta && rutaActual && (
+          {!cargandoRuta && !errorRuta && !estaEnRecorrido &&rutaActual && (
             <Mapa geometria={rutaActual.geometria} />
           )}
         </div>
 
-        <SeguimientoCamion />
+       
+          <SeguimientoCamion geometriaOFI={setEstaEnRecorrido} />
+       
 
         <section className={stylesInicio.seccionReportes}>
           <div className={stylesInicio.encabezadoReportes}>

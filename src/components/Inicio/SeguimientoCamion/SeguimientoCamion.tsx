@@ -27,6 +27,10 @@ interface Horario {
   horaFin: string;
 }
 
+interface MapaProps {
+  geometriaOFI : (activo: boolean) => void;
+}
+
 interface Seguimiento {
   colonia: string;
   codigoPostal: string;
@@ -83,14 +87,16 @@ function textoAntiguedad(minutos: number | null): string {
   return horas === 1 ? "hace más de 1 hora" : `hace más de ${horas} horas`;
 }
 
-/**
- * Sección del Inicio del ciudadano que muestra dónde va el camión de su
- * colonia (HU-22). Si no hay recorrido activo, muestra los horarios.
- */
-function SeguimientoCamion() {
+function SeguimientoCamion({ geometriaOFI }: MapaProps) {
   const [seguimiento, setSeguimiento] = useState<Seguimiento | null>(null);
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(true);
+
+  useEffect(() => {
+  const activo = (seguimiento?.unidades.length ?? 0) > 0;
+
+  geometriaOFI(activo);
+  }, [seguimiento,geometriaOFI]);
 
   useEffect(() => {
     let activo = true;
@@ -123,6 +129,7 @@ function SeguimientoCamion() {
       window.clearInterval(intervalo);
     };
   }, []);
+  
 
   const hoy = diaDeHoy();
 
@@ -147,7 +154,10 @@ function SeguimientoCamion() {
       )}
 
       {seguimiento && seguimiento.unidades.length > 0 && (
+        
+        
         <div className={styles.unidades}>
+          
           {seguimiento.unidades.map((unidad) => {
             const tienePosicion =
               unidad.latitud !== null && unidad.longitud !== null;
