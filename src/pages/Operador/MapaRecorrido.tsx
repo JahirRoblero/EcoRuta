@@ -25,7 +25,6 @@ interface Datos {
 
 const CENTRO_OAXACA: Coordenada = [-96.7266, 17.0732];
 
-// Extraer coordenadas de la ruta planeada
 function trazoPlaneado(geometria: string | null): Coordenada[] {
   if (!geometria) return [];
 

@@ -6,7 +6,6 @@
   background-color: #f6f6f6;
 }
 
-/* Barra superior */
 .barra {
   display: flex;
   justify-content: space-between;
@@ -282,6 +281,7 @@
 
 .mapa {
   height: 320px;
+  width: 100%;
   border-radius: 8px;
   overflow: hidden;
 }
@@ -337,7 +337,6 @@
   margin: 4px 0 0;
 }
 
-/* Modal finalizar */
 .fondoModal {
   position: fixed;
   inset: 0;
@@ -390,12 +389,14 @@
   .usuario span {
     display: none;
   }
+
+  
 }
 
-/* Mapa del recorrido real */
 .contenedorMapa {
   display: flex;
   flex-direction: column;
+  width: 100%;
   gap: 8px;
 }
 

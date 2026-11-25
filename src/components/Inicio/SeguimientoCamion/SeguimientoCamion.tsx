@@ -13,9 +13,7 @@ interface Unidad {
   fechaHora: string | null;
   minutosSinActualizar: number | null;
   desactualizada: boolean;
-  /** Puntos [longitud, latitud] por donde ya pasó la unidad. */
   recorrido: [number, number][];
-  /** Incidencias abiertas del recorrido (solo tipo y hora). */
   avisos: { tipo: string; fechaHora: string | null }[];
 }
 
@@ -39,7 +37,6 @@ interface Seguimiento {
   horarios: Horario[];
 }
 
-/** El ciudadano consulta nuevas posiciones cada 15 s; el operador solo envía al pulsar el botón. */
 const INTERVALO_ACTUALIZACION_MS = 15_000;
 
 const DIAS = [
@@ -58,7 +55,6 @@ const RESIDUOS: Record<string, string> = {
   INORGANICO: "Inorgánico",
 };
 
-/** Día de la semana en Oaxaca: 1 = lunes ... 7 = domingo. */
 function diaDeHoy(): number {
   const nombre = new Date().toLocaleDateString("en-US", {
     weekday: "short",
@@ -136,7 +132,6 @@ function SeguimientoCamion({ geometriaOFI }: MapaProps) {
   return (
     <section className={styles.seccion} aria-labelledby="titulo-seguimiento">
       <header className={styles.encabezado}>
-        <h2 id="titulo-seguimiento">¿Dónde va el camión?</h2>
         {seguimiento && (
           <p>
             Colonia {seguimiento.colonia} ({seguimiento.codigoPostal}) · se
@@ -155,7 +150,6 @@ function SeguimientoCamion({ geometriaOFI }: MapaProps) {
 
       {seguimiento && seguimiento.unidades.length > 0 && (
         
-        
         <div className={styles.unidades}>
           
           {seguimiento.unidades.map((unidad) => {
@@ -165,7 +159,7 @@ function SeguimientoCamion({ geometriaOFI }: MapaProps) {
             return (
               <article key={unidad.rutaNombre} className={styles.unidad}>
                 <div className={styles.datosUnidad}>
-                  <span className={styles.enRecorrido}>En recorrido</span>
+                  <div className={styles.rutaCorrecta}><span className={styles.enRecorrido}>En recorrido</span>
                   <h3>{unidad.rutaNombre}</h3>
                   <p>Unidad {unidad.numeroEconomico}</p>
 
@@ -177,7 +171,8 @@ function SeguimientoCamion({ geometriaOFI }: MapaProps) {
                   ) : (
                     <p>La unidad todavía no reporta su ubicación.</p>
                   )}
-
+              </div>
+                  
                   {(unidad.avisos ?? []).length > 0 && (
                     <div className={styles.avisoIncidencia} role="alert">
                       <strong>Posible retraso en tu ruta</strong>
@@ -190,15 +185,15 @@ function SeguimientoCamion({ geometriaOFI }: MapaProps) {
                           </li>
                         ))}
                       </ul>
-                    </div>
-                  )}
 
-                  {tienePosicion && unidad.desactualizada && (
+                      {tienePosicion && unidad.desactualizada && (
                     <p className={styles.noActualizada} role="status">
                       Ubicación no actualizada: el camión lleva más de{" "}
                       {seguimiento.minutosParaDesactualizada} minutos sin
                       reportar.
                     </p>
+                  )}
+                    </div>
                   )}
                 </div>
 
