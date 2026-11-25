@@ -129,13 +129,14 @@
   }
 
   .avisoIncidencia {
-    align-items: stretch;
+    align-items: center;
     border-top: 1px solid #bbb;
-
+text-align: center;
   }
 
   .rutaCorrecta{
     border-right: none;
+    text-align: center;
   }
   .unidad {
     padding: 12px;
@@ -148,6 +149,8 @@
 .avisoIncidencia {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: 3px;
   padding: 12px;
   border-radius: 6px;
