@@ -1,4 +1,3 @@
-
 import { useEffect, useMemo, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -67,7 +66,6 @@ function linea(coordenadas: Coordenada[]) {
   };
 }
 
-// Crear marcador personalizado del camión
 function crearMarcadorUnidad(): HTMLElement {
   const elemento = document.createElement("div");
   elemento.className = styles.marcadorUnidad;
@@ -83,7 +81,7 @@ function MapaRecorrido({
   seguir,
   mostrarRecorrido = true,
 }: MapaRecorridoProps) {
-  const contenedor = useRef<HTMLDivElement | null>(null);
+  const contenedor = useRef<HTMLDivElemenst | null>(null);
   const mapa = useRef<mapboxgl.Map | null>(null);
 
   // Marcador de la ubicación actual del camión
