@@ -1,0 +1,154 @@
+.fondo {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: white;
+  border-radius: 10px;
+  border-top: 4px solid #b38e5d;
+  padding: 24px 28px;
+  width: min(560px, 92vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  font-family: "Montserrat", sans-serif;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.titulo {
+  margin: 0 0 8px;
+  color: #9d2449;
+}
+
+.etiqueta {
+  margin-top: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #444;
+}
+
+.contador {
+  font-weight: 400;
+  color: #777;
+}
+
+.campo {
+  padding: 9px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+.campo:focus {
+  outline: none;
+  border-color: #9d2449;
+}
+
+.campo:disabled {
+  background-color: #f4f4f4;
+  color: #777;
+  cursor: not-allowed;
+}
+
+.listaColonias {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 4px 0;
+}
+
+.opcionColonia {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.opcionColonia:hover {
+  background-color: #faf3f5;
+}
+
+.codigo {
+  margin-left: auto;
+  color: #888;
+  font-size: 0.8rem;
+}
+
+.vacio {
+  margin: 0;
+  padding: 12px;
+  color: #777;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.error {
+  margin: 0;
+  color: #c0392b;
+  font-size: 0.82rem;
+}
+
+.errorServidor {
+  margin: 8px 0 0;
+  padding: 10px 14px;
+  color: #c0392b;
+  background-color: #fdecea;
+  border-left: 4px solid #c0392b;
+  border-radius: 6px;
+  font-size: 0.88rem;
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.botonCancelar,
+.botonGuardar {
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.botonCancelar {
+  background: white;
+  border: 1px solid #ccc;
+  color: #444;
+}
+
+.botonCancelar:hover:not(:disabled) {
+  background-color: #f2f2f2;
+}
+
+.botonGuardar {
+  background-color: #9d2449;
+  border: none;
+  color: white;
+}
+
+.botonGuardar:hover:not(:disabled) {
+  background-color: #7e1d3a;
+}
+
+.botonCancelar:disabled,
+.botonGuardar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

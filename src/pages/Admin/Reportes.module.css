@@ -1,0 +1,137 @@
+.encabezado {
+  margin-bottom: 24px;
+  font-family: "Montserrat", sans-serif;
+}
+
+.encabezado h1 {
+  margin: 0;
+  color: #9d2449;
+}
+
+.encabezado p {
+  margin: 4px 0 0;
+  color: #666;
+}
+
+.selector {
+  padding: 9px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: inherit;
+}
+
+.selectorAccion {
+  padding: 5px 8px;
+  border: 1px solid #9d2449;
+  border-radius: 6px;
+  color: #9d2449;
+  background: white;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.selectorAccion:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.miniatura {
+  display: block;
+  width: 64px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #e5e5e5;
+  background-color: #f4f4f4;
+}
+
+.sinImagen {
+  color: #aaa;
+  font-size: 0.8rem;
+}
+
+.celdaReporte {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 320px;
+}
+
+.celdaReporte span {
+  color: #666;
+  font-size: 0.85rem;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.celdaEstado {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.celdaEstado small {
+  color: #777;
+  font-size: 0.75rem;
+}
+
+.etiqueta {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.estadoPendiente {
+  background-color: #fff4e0;
+  color: #9a6200;
+}
+
+.estadoProceso {
+  background-color: #e6eef6;
+  color: #2f5d8a;
+}
+
+.estadoAtendido {
+  background-color: #e6f4ea;
+  color: #1e7a3c;
+}
+
+.estadoRechazado {
+  background-color: #f1f1f1;
+  color: #777;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border: 1px solid #f1b5b5;
+  border-radius: 6px;
+  background-color: #fdecec;
+  color: #9b1c1c;
+}
+
+.botonReintentar {
+  background: white;
+  border: 1px solid #9d2449;
+  color: #9d2449;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.botonReintentar:hover {
+  background-color: #9d2449;
+  color: white;
+}

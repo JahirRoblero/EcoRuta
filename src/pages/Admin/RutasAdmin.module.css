@@ -1,0 +1,216 @@
+.encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.encabezado h1 {
+  margin: 0;
+  color: #9d2449;
+  font-family: "Montserrat", sans-serif;
+}
+
+.encabezado p {
+  margin: 4px 0 0;
+  color: #666;
+  font-family: "Montserrat", sans-serif;
+}
+
+.botonPrimario {
+  background-color: #9d2449;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+.botonPrimario:hover:not(:disabled) {
+  background-color: #7e1d3a;
+}
+
+.botonPrimario:disabled {
+  background-color: #c7a4ad;
+  cursor: not-allowed;
+}
+
+.controles {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.buscador {
+  flex: 1;
+  min-width: 240px;
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.buscador:focus {
+  outline: none;
+  border-color: #9d2449;
+}
+
+.filtro {
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+  background: white;
+  cursor: pointer;
+}
+
+.estado {
+  color: #666;
+  font-family: "Montserrat", sans-serif;
+  padding: 24px;
+  text-align: center;
+}
+
+.errorMsg {
+  color: #c0392b;
+  background-color: #fdecea;
+  padding: 12px 16px;
+  border-radius: 6px;
+  border-left: 4px solid #c0392b;
+  font-family: "Montserrat", sans-serif;
+}
+
+.contenedorTabla {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.9rem;
+}
+
+.tabla thead {
+  background-color: #f8f3f5;
+  border-bottom: 2px solid #b38e5d;
+}
+
+.tabla th {
+  text-align: left;
+  padding: 14px 16px;
+  color: #9d2449;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.tabla td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.tabla tbody tr:hover {
+  background-color: #fafafa;
+}
+
+.nombreCelda {
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+.descripcionCelda {
+  color: #666;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.badgeActivo {
+  background-color: #d4edda;
+  color: #1e7e34;
+}
+
+.badgeInactivo {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.acciones {
+  display: flex;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.botonSecundario {
+  background: transparent;
+  color: #9d2449;
+  border: 1px solid #9d2449;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.botonSecundario:hover:not(:disabled) {
+  background-color: #9d2449;
+  color: white;
+}
+
+.botonSecundario:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.botonPeligro {
+  background: transparent;
+  color: #c0392b;
+  border: 1px solid #c0392b;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.botonPeligro:hover:not(:disabled) {
+  background-color: #c0392b;
+  color: white;
+}
+
+.botonPeligro:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

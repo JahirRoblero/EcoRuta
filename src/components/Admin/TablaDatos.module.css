@@ -1,0 +1,85 @@
+.contenedor {
+  font-family: "Montserrat", sans-serif;
+}
+
+.barra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.buscador {
+  flex: 1;
+  min-width: 220px;
+  padding: 9px 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: inherit;
+}
+
+.buscador:focus {
+  outline: none;
+  border-color: #9d2449;
+}
+
+.filtros {
+  display: flex;
+  gap: 8px;
+}
+
+.envoltura {
+  overflow-x: auto;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla th {
+  background-color: #9d2449;
+  color: white;
+  text-align: left;
+  padding: 12px 16px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tabla td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  color: #333;
+}
+
+.tabla tbody tr:hover {
+  background-color: #faf6f0;
+}
+
+.botonOrden {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.celdaAcciones {
+  white-space: nowrap;
+}
+
+.mensaje {
+  text-align: center;
+  color: #777;
+  padding: 32px 16px;
+}
+
+.conteo {
+  margin-top: 10px;
+  color: #777;
+  font-size: 0.85rem;
+}

@@ -6,6 +6,13 @@ import Login from "./pages/Login/Login";
 import Inicio from "./pages/Inicio";
 import NoEncontrado from "./pages/NoEncontrado";
 
+import AdminLayout from "./pages/Admin/AdminLayout";
+import Dashboard from "./pages/Admin/Dashboard";
+import Usuarios from "./pages/Admin/Usuarios";
+import Operadores from "./pages/Admin/Operadores";
+import RutasAdmin from "./pages/Admin/RutasAdmin";
+import ReportesAdmin from "./pages/Admin/Reportes";
+
 import RutaProtegida from "./components/RutaProtegida";
 import Reportes from "./pages/Reportes/Reportes";
 import "./App.css";
@@ -35,8 +42,14 @@ function App() {
       </Route>
 
       <Route element={<RutaProtegida rolRequerido="admin" />}>
-        <Route path="/admin" element={<Asignaciones />} />
-        <Route path="/admin/asignaciones" element={<Asignaciones />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="usuarios" element={<Usuarios />} />
+          <Route path="operadores" element={<Operadores />} />
+          <Route path="rutas" element={<RutasAdmin />} />
+          <Route path="reportes" element={<ReportesAdmin />} />
+          <Route path="asignaciones" element={<Asignaciones />} />
+        </Route>
       </Route>
 
       <Route path="*" element={<NoEncontrado />} />
