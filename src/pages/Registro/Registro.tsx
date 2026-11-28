@@ -37,7 +37,6 @@ type Campo =
 
 type Errores = Partial<Record<Campo, string>>;
 
-// Orden en que aparecen en pantalla (para enfocar el primer campo con error)
 const ORDEN_CAMPOS: Campo[] = [
   "nombre",
   "apellidoPaterno",
@@ -151,10 +150,6 @@ function Registro() {
 
     return false;
   };
-
-  // ------------------------------------------------------------
-  // Cambios en los campos
-  // ------------------------------------------------------------
 
   const cambiarCorreo = (valor: string) => {
     setCorreo(limpiarCorreo(valor));

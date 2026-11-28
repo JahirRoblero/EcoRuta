@@ -9,6 +9,7 @@ const OPCIONES = [
   { ruta: "/admin/operadores", etiqueta: "Operadores" },
   { ruta: "/admin/rutas", etiqueta: "Rutas" },
   { ruta: "/admin/reportes", etiqueta: "Reportes" },
+  { ruta: "/admin/asignaciones", etiqueta: "Asignaciones" },
 ];
 
 export default function BarraLateralAdmin() {

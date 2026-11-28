@@ -13,9 +13,7 @@ interface Unidad {
   fechaHora: string | null;
   minutosSinActualizar: number | null;
   desactualizada: boolean;
-  /** Puntos [longitud, latitud] por donde ya pasó la unidad. */
   recorrido: [number, number][];
-  /** Incidencias abiertas del recorrido (solo tipo y hora). */
   avisos: { tipo: string; fechaHora: string | null }[];
 }
 
@@ -27,6 +25,10 @@ interface Horario {
   horaFin: string;
 }
 
+interface MapaProps {
+  geometriaOFI : (activo: boolean) => void;
+}
+
 interface Seguimiento {
   colonia: string;
   codigoPostal: string;
@@ -35,7 +37,6 @@ interface Seguimiento {
   horarios: Horario[];
 }
 
-/** Cada cuánto se vuelve a consultar la posición (el operador la envía cada 15 s). */
 const INTERVALO_ACTUALIZACION_MS = 15_000;
 
 const DIAS = [
@@ -54,7 +55,6 @@ const RESIDUOS: Record<string, string> = {
   INORGANICO: "Inorgánico",
 };
 
-/** Día de la semana en Oaxaca: 1 = lunes ... 7 = domingo. */
 function diaDeHoy(): number {
   const nombre = new Date().toLocaleDateString("en-US", {
     weekday: "short",
@@ -83,14 +83,16 @@ function textoAntiguedad(minutos: number | null): string {
   return horas === 1 ? "hace más de 1 hora" : `hace más de ${horas} horas`;
 }
 
-/**
- * Sección del Inicio del ciudadano que muestra dónde va el camión de su
- * colonia (HU-22). Si no hay recorrido activo, muestra los horarios.
- */
-function SeguimientoCamion() {
+function SeguimientoCamion({ geometriaOFI }: MapaProps) {
   const [seguimiento, setSeguimiento] = useState<Seguimiento | null>(null);
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(true);
+
+  useEffect(() => {
+  const activo = (seguimiento?.unidades.length ?? 0) > 0;
+
+  geometriaOFI(activo);
+  }, [seguimiento,geometriaOFI]);
 
   useEffect(() => {
     let activo = true;
@@ -123,13 +125,13 @@ function SeguimientoCamion() {
       window.clearInterval(intervalo);
     };
   }, []);
+  
 
   const hoy = diaDeHoy();
 
   return (
     <section className={styles.seccion} aria-labelledby="titulo-seguimiento">
       <header className={styles.encabezado}>
-        <h2 id="titulo-seguimiento">¿Dónde va el camión?</h2>
         {seguimiento && (
           <p>
             Colonia {seguimiento.colonia} ({seguimiento.codigoPostal}) · se
@@ -147,7 +149,9 @@ function SeguimientoCamion() {
       )}
 
       {seguimiento && seguimiento.unidades.length > 0 && (
+        
         <div className={styles.unidades}>
+          
           {seguimiento.unidades.map((unidad) => {
             const tienePosicion =
               unidad.latitud !== null && unidad.longitud !== null;
@@ -155,7 +159,7 @@ function SeguimientoCamion() {
             return (
               <article key={unidad.rutaNombre} className={styles.unidad}>
                 <div className={styles.datosUnidad}>
-                  <span className={styles.enRecorrido}>En recorrido</span>
+                  <div className={styles.rutaCorrecta}><span className={styles.enRecorrido}>En recorrido</span>
                   <h3>{unidad.rutaNombre}</h3>
                   <p>Unidad {unidad.numeroEconomico}</p>
 
@@ -167,7 +171,8 @@ function SeguimientoCamion() {
                   ) : (
                     <p>La unidad todavía no reporta su ubicación.</p>
                   )}
-
+              </div>
+                  
                   {(unidad.avisos ?? []).length > 0 && (
                     <div className={styles.avisoIncidencia} role="alert">
                       <strong>Posible retraso en tu ruta</strong>
@@ -180,15 +185,15 @@ function SeguimientoCamion() {
                           </li>
                         ))}
                       </ul>
-                    </div>
-                  )}
 
-                  {tienePosicion && unidad.desactualizada && (
+                      {tienePosicion && unidad.desactualizada && (
                     <p className={styles.noActualizada} role="status">
                       Ubicación no actualizada: el camión lleva más de{" "}
                       {seguimiento.minutosParaDesactualizada} minutos sin
                       reportar.
                     </p>
+                  )}
+                    </div>
                   )}
                 </div>
 

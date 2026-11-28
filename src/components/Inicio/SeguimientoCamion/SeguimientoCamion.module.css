@@ -1,24 +1,22 @@
 .seccion {
-  width: 100%;
-  max-width: 1250px;
-  margin: 30px auto;
-  padding: 0 16px;
-  box-sizing: border-box;
-  font-family: "Montserrat", sans-serif;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-}
+  gap: 16px;
 
-.encabezado h2 {
-  margin: 0;
-  color: #9d2449;
+  width: 100%;
+  max-width: 1250px;
+  margin: 0 auto;
+  padding: 0 16px;
+
+  box-sizing: border-box;
+  font-family: "Montserrat", sans-serif;
 }
 
 .encabezado p {
   margin: 4px 0 0;
   color: #555;
   font-size: 0.9rem;
+  text-align: center;
 }
 
 .aviso {
@@ -36,19 +34,25 @@
 }
 
 .unidad {
-  display: grid;
-  grid-template-columns: minmax(220px, 1fr) 3fr;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   gap: 16px;
   padding: 16px;
   border-radius: 10px;
   background: white;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
 }
 
 .datosUnidad {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: flex-start;
+  width: 100%;
+  gap: 16px;
+}
+
+.datosUnidad > div {
+  flex: 1;
+  min-width: 0;
 }
 
 .datosUnidad h3,
@@ -57,20 +61,16 @@
 }
 
 .enRecorrido {
-  align-self: flex-start;
-  padding: 3px 10px;
+  align-self:center;
+  border: none;
   border-radius: 12px;
-  background-color: #e6f4ea;
   color: #1e5e2f;
   font-size: 0.8rem;
   font-weight: 600;
 }
 
 .noActualizada {
-  padding: 8px 10px;
-  border-radius: 6px;
-  background-color: #fdecea;
-  color: #8a1c1c;
+  color: #bd0900;
   font-weight: 600;
   font-size: 0.9rem;
 }
@@ -88,7 +88,7 @@
 
 .mensajeSinRecorrido {
   font-weight: 700;
-  color: #9d2449;
+  color: #ff004c;
 }
 
 .horarios {
@@ -114,27 +114,50 @@
   font-weight: 700;
 }
 
+.rutaCorrecta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 12px;
+  border-right: 1px solid #bbb;
+}
 @media (max-width: 760px) {
+  .datosUnidad {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .avisoIncidencia {
+    align-items: center;
+    border-top: 1px solid #bbb;
+text-align: center;
+  }
+
+  .rutaCorrecta{
+    border-right: none;
+    text-align: center;
+  }
   .unidad {
-    grid-template-columns: 1fr;
+    padding: 12px;
   }
 
   .horarios {
     font-size: 0.85rem;
   }
 }
-
-/* Aviso de incidencia en la ruta (HU-24 CA2) */
 .avisoIncidencia {
-  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 3px;
+  padding: 12px;
   border-radius: 6px;
-  border-left: 5px solid #e09b00;
-  background-color: #fff4d6;
-  color: #6b4d00;
+  color: #bd0900;
   font-size: 0.9rem;
 }
-
 .avisoIncidencia ul {
-  margin: 4px 0 0;
-  padding-left: 18px;
+  padding: 0;
+  list-style: none;
 }

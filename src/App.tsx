@@ -20,6 +20,7 @@ import PuntosBasura from "./pages/PuntosBasura/PuntosBasura";
 import Registro from "./pages/Registro/Registro";
 import MiPerfil from "./pages/MiPerfil/MiPerfil";
 import PanelOperador from "./pages/Operador/PanelOperador";
+import Asignaciones from "./pages/Admin/Asignaciones";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
           <Route path="operadores" element={<Operadores />} />
           <Route path="rutas" element={<RutasAdmin />} />
           <Route path="reportes" element={<ReportesAdmin />} />
+          <Route path="asignaciones" element={<Asignaciones />} />
         </Route>
       </Route>
 

@@ -6,7 +6,6 @@
   background-color: #f6f6f6;
 }
 
-/* Barra superior */
 .barra {
   display: flex;
   justify-content: space-between;
@@ -281,7 +280,8 @@
 }
 
 .mapa {
-  height: 320px;
+  height: 420px;
+  width: 100%;
   border-radius: 8px;
   overflow: hidden;
 }
@@ -337,7 +337,6 @@
   margin: 4px 0 0;
 }
 
-/* Modal finalizar */
 .fondoModal {
   position: fixed;
   inset: 0;
@@ -392,10 +391,10 @@
   }
 }
 
-/* Mapa del recorrido real */
 .contenedorMapa {
   display: flex;
   flex-direction: column;
+  width: 100%;
   gap: 8px;
 }
 
@@ -449,4 +448,14 @@
   margin: 8px 0 0;
   font-size: 1.1rem;
   color: #333;
+}
+
+.leyendaPlaneada {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background-color: #ffffff;
+  border: 2.5px solid #6b6b6b;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
